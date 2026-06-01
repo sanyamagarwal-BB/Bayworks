@@ -1,0 +1,272 @@
+/* BAYWORKS — Main JS */
+import { applyCMS } from './cms.js';
+
+// Hero brief form — redirects to WhatsApp with pre-filled message
+window.handleHeroBrief = function(e) {
+  e.preventDefault();
+  const f = e.target;
+  const seats = f.seats.value || 'Not specified';
+  const city  = f.city.value  || 'Not specified';
+  const phone = f.phone.value || '';
+  const msg = encodeURIComponent(
+    `Hi BAYWORKS, I need office space:\n• Seats: ${seats}\n• City: ${city}\n• My number: ${phone}\n\nPlease send me a shortlist.`
+  );
+  window.open(`https://wa.me/919205005399?text=${msg}`, '_blank');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyCMS();
+  initNav();
+  initReveal();
+  initCounters();
+  initFAQ();
+});
+
+/* ── NAV: scroll class + mobile toggle ────────────────────────── */
+function initNav() {
+  const nav = document.getElementById('nav');
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('nav-mobile');
+
+  // Scroll class
+  const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 50);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Hamburger
+  hamburger?.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu?.classList.toggle('open');
+  });
+
+  // Close mobile menu on link click
+  mobileMenu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger?.classList.remove('open');
+      mobileMenu?.classList.remove('open');
+    });
+  });
+}
+
+/* ── SCROLL REVEAL ─────────────────────────────────────────────── */
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // Stagger siblings in the same grid
+        const siblings = [...entry.target.parentElement.querySelectorAll('.reveal:not(.in-view)')];
+        const delay = siblings.indexOf(entry.target) * 80;
+        setTimeout(() => entry.target.classList.add('in-view'), delay);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  els.forEach(el => obs.observe(el));
+}
+
+/* ── COUNTER ANIMATIONS ────────────────────────────────────────── */
+function initCounters() {
+  const metrics = document.querySelectorAll('.metric-num');
+
+  const animateNum = (el, target, decimals = 0) => {
+    let start = 0;
+    const duration = 1800;
+    const startTime = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const value = eased * target;
+      const unit = el.querySelector('.metric-unit');
+      const unitText = unit ? unit.outerHTML : '';
+      el.innerHTML = (decimals ? value.toFixed(decimals) : Math.floor(value)) + unitText;
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  const targets = [48, 12, 0, 21];
+  const obs = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      metrics.forEach((el, i) => animateNum(el, targets[i]));
+      obs.disconnect();
+    }
+  }, { threshold: 0.5 });
+
+  const heroMetrics = document.querySelector('.hero-metrics');
+  if (heroMetrics) obs.observe(heroMetrics);
+}
+
+/* ── FAQ ACCORDION ────────────────────────────────────────────── */
+function initFAQ() {
+  document.querySelectorAll('.faq-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answerId = btn.dataset.faq;
+      const answer = document.getElementById(answerId);
+      const isOpen = answer.classList.contains('open');
+
+      // Close all other FAQs
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+      document.querySelectorAll('.faq-toggle').forEach(b => b.classList.remove('open'));
+
+      // Toggle current
+      if (!isOpen) {
+        answer.classList.add('open');
+        btn.classList.add('open');
+      }
+    });
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════ */
+/* SPRINT 1: GAME-CHANGER FEATURES - INTERACTIVE JS */
+/* ═════════════════════════════════════════════════════════════ */
+
+/* QUOTE GENERATOR */
+document.getElementById('quote-btn')?.addEventListener('click', () => {
+  const city = document.getElementById('quote-city');
+  const size = parseFloat(document.getElementById('quote-size').value);
+  const duration = parseInt(document.getElementById('quote-duration').value);
+  
+  if (!city.value || !size || size < 1000) {
+    alert('Please enter valid city and size (min 1000 sqft)');
+    return;
+  }
+  
+  const pricePerSqFt = parseFloat(city.options[city.selectedIndex].dataset.price) || 80;
+  const monthlyRent = (size * pricePerSqFt) / 1000;
+  const totalMonthly = Math.round(monthlyRent);
+  
+  document.getElementById('quote-display').textContent = '₹' + totalMonthly.toLocaleString();
+  document.querySelector('.quote-form').style.display = 'none';
+  document.getElementById('quote-result').style.display = 'block';
+});
+
+/* SAVINGS CALCULATOR */
+function updateSavings() {
+  const currentRent = parseFloat(document.getElementById('current-rent').value) || 0;
+  const currentCapex = parseFloat(document.getElementById('current-capex').value) || 0;
+  const baywoksRent = parseFloat(document.getElementById('bayworks-rent').value) || 0;
+  
+  const currentAnnual = (currentRent * 12) + currentCapex;
+  const baywoksAnnual = baywoksRent * 12;
+  const savings = currentAnnual - baywoksAnnual;
+  const percent = currentAnnual > 0 ? Math.round((savings / currentAnnual) * 100) : 0;
+  
+  document.getElementById('current-total').textContent = '₹' + currentAnnual.toLocaleString();
+  document.getElementById('bayworks-total').textContent = '₹' + baywoksAnnual.toLocaleString();
+  document.getElementById('savings-amount').textContent = '₹' + Math.max(0, savings).toLocaleString();
+  document.getElementById('savings-pct').textContent = `/year (${Math.max(0, percent)}% reduction)`;
+}
+document.getElementById('current-rent')?.addEventListener('input', updateSavings);
+document.getElementById('current-capex')?.addEventListener('input', updateSavings);
+document.getElementById('bayworks-rent')?.addEventListener('input', updateSavings);
+
+/* PROPERTY BOOKING */
+document.querySelectorAll('.booking-time-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.booking-time-btn').forEach(b => b.classList.remove('selected'));
+    e.target.classList.add('selected');
+  });
+});
+
+document.getElementById('booking-confirm')?.addEventListener('click', () => {
+  const property = document.getElementById('booking-property').value;
+  const date = document.getElementById('booking-date').value;
+  const selected = document.querySelector('.booking-time-btn.selected');
+  const time = selected ? selected.dataset.time : 'Not selected';
+  const name = document.getElementById('booking-name').value;
+  const phone = document.getElementById('booking-phone').value;
+  
+  if (!date || !selected || !name || !phone) {
+    alert('Please fill all fields');
+    return;
+  }
+  
+  document.querySelector('.booking-form').style.display = 'none';
+  document.getElementById('booking-success').style.display = 'block';
+  document.getElementById('booking-confirm-text').textContent = `${property} on ${date} at ${time}. Confirmation email sent to your WhatsApp.`;
+});
+
+/* LEAD QUALIFICATION QUIZ */
+let quizAnswers = {};
+document.querySelectorAll('.quiz-opt').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const currentQ = e.target.closest('.quiz-question');
+    const nextQ = currentQ.nextElementSibling;
+
+    if (nextQ && nextQ.classList.contains('quiz-question')) {
+      currentQ.style.display = 'none';
+      nextQ.style.display = 'block';
+      quizAnswers[`q${Object.keys(quizAnswers).length + 1}`] = e.target.dataset.pkg || e.target.textContent;
+    } else {
+      showQuizResult(e.target.dataset.pkg || 'pro');
+    }
+  });
+});
+
+function showQuizResult(pkgType) {
+  const recommendations = {
+    'starter': '💼 Flex Desk Placement – Perfect for small teams up to 50 people',
+    'pro': '🏢 Managed Enterprise Floor – Best for growing teams 50–500 people',
+    'enterprise': '🌍 Campus / HQ Solutions – Ideal for large enterprises 500+ people'
+  };
+
+  document.querySelectorAll('.quiz-question').forEach(q => q.style.display = 'none');
+  document.getElementById('quiz-recommendation').textContent = recommendations[pkgType] || recommendations['pro'];
+  document.getElementById('quiz-result').style.display = 'block';
+}
+
+/* LIVE CHAT */
+document.getElementById('chat-open')?.addEventListener('click', () => {
+  document.getElementById('chat-widget').classList.add('open');
+  document.getElementById('chat-open').style.display = 'none';
+});
+
+document.getElementById('chat-close')?.addEventListener('click', () => {
+  document.getElementById('chat-widget').classList.remove('open');
+  document.getElementById('chat-open').style.display = 'block';
+});
+
+document.getElementById('chat-send')?.addEventListener('click', sendMessage);
+document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const msgs = document.getElementById('chat-messages');
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user-msg';
+  userMsg.innerHTML = `<p>${text}</p>`;
+  msgs.appendChild(userMsg);
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  
+  setTimeout(() => {
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot-msg';
+    botMsg.innerHTML = '<p>Thanks for your message! Our team will respond within 2 minutes. 💬</p>';
+    msgs.appendChild(botMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 500);
+}
+
+/* MOBILE APP NOTIFICATION */
+document.getElementById('app-notify')?.addEventListener('click', () => {
+  const email = document.getElementById('app-email').value;
+  if (!email) {
+    alert('Please enter your email');
+    return;
+  }
+  alert('✓ We\'ll notify you at ' + email + ' when the app launches!');
+  document.getElementById('app-email').value = '';
+});
+

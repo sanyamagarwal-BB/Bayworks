@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAYWORKS™ CMS Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', -apple-system, sans-serif;
+      background: #0F172A;
+      color: #E2E8F0;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ─ SIDEBAR ──────────────────────────────────────────────────── */
+    .admin-sidebar {
+      width: 260px;
+      background: #111827;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .admin-logo {
+      padding: 0 1.5rem 2rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .admin-logo-text {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .admin-nav {
+      list-style: none;
+      flex: 1;
+    }
+    .admin-nav-item {
+      display: block;
+    }
+    .admin-nav-btn {
+      width: 100%; text-align: left;
+      padding: 0.9rem 1.5rem;
+      background: none; border: none;
+      color: rgba(226,232,240,0.60);
+      font-size: 0.9rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .admin-nav-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255,255,255,0.04);
+    }
+    .admin-nav-btn.active {
+      color: #4ADE80;
+      background: rgba(74,222,128,0.10);
+      border-left: 3px solid #4ADE80;
+      padding-left: calc(1.5rem - 3px);
+    }
+
+    /* ─ MAIN CONTENT ────────────────────────────────────────────── */
+    .admin-main {
+      flex: 1;
+      margin-left: 260px;
+      padding: 2.5rem;
+      overflow-y: auto;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+    }
+    .admin-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.8rem;
+    }
+    .admin-btn {
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .admin-btn-save {
+      background: #4ADE80;
+      color: #111827;
+    }
+    .admin-btn-save:hover {
+      background: #22C55E;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(74,222,128,0.30);
+    }
+    .admin-btn-reset {
+      background: rgba(255,255,255,0.08);
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    .admin-btn-reset:hover {
+      background: rgba(255,255,255,0.14);
+    }
+    .admin-btn-view {
+      background: rgba(74,222,128,0.10);
+      color: #4ADE80;
+      border: 1px solid rgba(74,222,128,0.30);
+    }
+    .admin-btn-view:hover {
+      background: rgba(74,222,128,0.16);
+    }
+
+    /* ─ SECTIONS ────────────────────────────────────────────────── */
+    .admin-section {
+      display: none;
+    }
+    .admin-section.active { display: block; }
+
+    .admin-section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(74,222,128,0.30);
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 1.8rem;
+    }
+
+    .admin-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .admin-field label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(226,232,240,0.50);
+    }
+    .admin-field input,
+    .admin-field textarea {
+      padding: 0.8rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: #FFFFFF;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .admin-field input:focus,
+    .admin-field textarea:focus {
+      border-color: rgba(74,222,128,0.60);
+      background: rgba(255,255,255,0.08);
+    }
+    .admin-field textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.5;
+    }
+
+    .admin-field-hint {
+      font-size: 0.75rem;
+      color: rgba(226,232,240,0.35);
+      margin-top: 0.2rem;
+    }
+
+    /* ─ GRID: Two columns on wider screens ──────────────────────── */
+    @media (min-width: 1200px) {
+      .admin-form {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+      .admin-field--full {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ─ STATUS MESSAGE ──────────────────────────────────────────── */
+    .admin-status {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .admin-status.show { display: block; }
+    .admin-status.success {
+      background: rgba(74,222,128,0.15);
+      border: 1px solid rgba(74,222,128,0.30);
+      color: #86EFAC;
+    }
+    .admin-status.error {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.30);
+      color: #FCA5A5;
+    }
+
+    /* ─ RESPONSIVE ──────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .admin-sidebar {
+        width: 220px;
+      }
+      .admin-main {
+        margin-left: 220px;
+        padding: 1.5rem;
+      }
+      .admin-title {
+        font-size: 1.4rem;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body { flex-direction: column; }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding: 1.5rem 0;
+      }
+      .admin-main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <span class="admin-logo-text">BAYWORKS™<br/><span style="font-size:0.7rem;color:rgba(226,232,240,0.50);font-weight:400;">CMS Dashboard</span></span>
+    </div>
+    <nav class="admin-nav">
+      <button class="admin-nav-btn active" data-section="hero">Hero Section</button>
+      <button class="admin-nav-btn" data-section="metrics">Metrics Strip</button>
+      <button class="admin-nav-btn" data-section="pain">Pain Points</button>
+      <button class="admin-nav-btn" data-section="solutions">Solutions</button>
+      <button class="admin-nav-btn" data-section="testimonials">Testimonials</button>
+      <button class="admin-nav-btn" data-section="clients">Clients Ribbon</button>
+      <button class="admin-nav-btn" data-section="faq">FAQ</button>
+      <button class="admin-nav-btn" data-section="pricing">Pricing</button>
+      <button class="admin-nav-btn" data-section="process">Process</button>
+      <button class="admin-nav-btn" data-section="case-studies">Case Studies</button>
+      <button class="admin-nav-btn" data-section="team">Team</button>
+      <button class="admin-nav-btn" data-section="about">About</button>
+      <button class="admin-nav-btn" data-section="contact">Contact &amp; CTA</button>
+      <button class="admin-nav-btn" data-section="footer">Footer</button>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:1rem 0;">
+      <button class="admin-nav-btn" data-section="sprint2-prop">Sprint 2: Property Tools</button>
+      <button class="admin-nav-btn" data-section="sprint2-fin">Sprint 2: Financial Tools</button>
+      <button class="admin-nav-btn" data-section="sprint2-roadmap">Sprint 2: Tier 3 Roadmap</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 class="admin-title">Content Management</h1>
+      <div class="admin-actions">
+        <a href="/" class="admin-btn admin-btn-view">View Live Site →</a>
+        <button id="reset-btn" class="admin-btn admin-btn-reset">Reset to Defaults</button>
+        <button id="save-btn" class="admin-btn admin-btn-save">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="status" class="admin-status"></div>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="admin-section active">
+      <h2 class="admin-section-title">Hero Section</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>Badge Text</label>
+          <input type="text" id="hero_badge" placeholder="Live across 12 Cities + Dubai" />
+        </div>
+        <div class="admin-field">
+          <label>H1 - Line 1</label>
+          <input type="text" id="hero_h1_1" placeholder="Corporate Leasing," />
+        </div>
+        <div class="admin-field">
+          <label>H1 - Line 2 (Accent)</label>
+          <input type="text" id="hero_h1_2" placeholder="Without the Headache." />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Subheadline</label>
+          <textarea id="hero_sub" placeholder="Grade-A offices across India and Dubai..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- METRICS SECTION -->
+    <section id="metrics" class="admin-section">
+      <h2 class="admin-section-title">Metrics Strip</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>Metric 1 - Value</label>
+          <input type="text" id="metric_1_val" placeholder="120k+" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 1 - Label</label>
+          <input type="text" id="metric_1_label" placeholder="Sq. Ft. closed in a single deal" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 2 - Value</label>
+          <input type="text" id="metric_2_val" placeholder="40%" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 2 - Label</label>
+          <input type="text" id="metric_2_label" placeholder="Avg. lease liability reduction" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 3 - Value</label>
+          <input type="text" id="metric_3_val" placeholder="0%" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 3 - Label</label>
+          <input type="text" id="metric_3_label" placeholder="CapEx on managed fit-outs" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 4 - Value</label>
+          <input type="text" id="metric_4_val" placeholder="21 days" />
+        </div>
+        <div class="admin-field">
+          <label>Metric 4 - Label</label>
+          <input type="text" id="metric_4_label" placeholder="Fastest deal closure on record" />
+        </div>
+      </form>
+    </section>
+
+    <!-- PAIN POINTS SECTION -->
+    <section id="pain" class="admin-section">
+      <h2 class="admin-section-title">Pain Points Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full">
+          <label>Section Heading</label>
+          <input type="text" id="pain_heading" placeholder="3 Headaches Every Procurement Team Faces" />
+        </div>
+        <div class="admin-field">
+          <label>Pain Point 1 - Title</label>
+          <input type="text" id="pain_1_title" placeholder="The Vendor Runaround" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Pain Point 1 - Description</label>
+          <textarea id="pain_1_desc" placeholder="Five different local brokers..."></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Pain Point 2 - Title</label>
+          <input type="text" id="pain_2_title" placeholder="The Cash Burn" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Pain Point 2 - Description</label>
+          <textarea id="pain_2_desc" placeholder="Massive upfront CapEx..."></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Pain Point 3 - Title</label>
+          <input type="text" id="pain_3_title" placeholder="The Scaling Trap" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Pain Point 3 - Description</label>
+          <textarea id="pain_3_desc" placeholder="Signing a strict 3–5 year..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- SOLUTIONS SECTION -->
+    <section id="solutions" class="admin-section">
+      <h2 class="admin-section-title">Solutions Section</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>Solution 1 - Title</label>
+          <input type="text" id="sol_1_title" placeholder="Zero-CapEx Managed Spaces" />
+        </div>
+        <div class="admin-field">
+          <label>Solution 1 - Tag</label>
+          <input type="text" id="sol_1_tag" placeholder="Balance Sheet Optimisation" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Solution 1 - Description</label>
+          <textarea id="sol_1_desc" placeholder="We specialise in sourcing..."></textarea>
+        </div>
+
+        <div class="admin-field">
+          <label>Solution 2 - Title</label>
+          <input type="text" id="sol_2_title" placeholder="48-Hour Filtering Protocol" />
+        </div>
+        <div class="admin-field">
+          <label>Solution 2 - Tag</label>
+          <input type="text" id="sol_2_tag" placeholder="Speed to Decision" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Solution 2 - Description</label>
+          <textarea id="sol_2_desc" placeholder="Give us your headcount..."></textarea>
+        </div>
+
+        <div class="admin-field">
+          <label>Solution 3 - Title</label>
+          <input type="text" id="sol_3_title" placeholder="Agility Built Into Every Lease" />
+        </div>
+        <div class="admin-field">
+          <label>Solution 3 - Tag</label>
+          <input type="text" id="sol_3_tag" placeholder="Future-Proof Leasing" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Solution 3 - Description</label>
+          <textarea id="sol_3_desc" placeholder="We structure flexible..."></textarea>
+        </div>
+
+        <div class="admin-field">
+          <label>Solution 4 - Title</label>
+          <input type="text" id="sol_4_title" placeholder="In-House Legal & Due Diligence" />
+        </div>
+        <div class="admin-field">
+          <label>Solution 4 - Tag</label>
+          <input type="text" id="sol_4_tag" placeholder="Risk Elimination" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Solution 4 - Description</label>
+          <textarea id="sol_4_desc" placeholder="Our legal team clears..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section id="testimonials" class="admin-section">
+      <h2 class="admin-section-title">Testimonials Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full">
+          <label>Testimonial 1 - Quote</label>
+          <textarea id="test_1_quote" placeholder="Quote text here..."></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 1 - Name</label>
+          <input type="text" id="test_1_name" placeholder="Madhav Kumar" />
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 1 - Role</label>
+          <input type="text" id="test_1_role" placeholder="VP, Operations — Tech Startup" />
+        </div>
+
+        <div class="admin-field admin-field--full">
+          <label>Testimonial 2 - Quote</label>
+          <textarea id="test_2_quote" placeholder="Quote text here..."></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 2 - Name</label>
+          <input type="text" id="test_2_name" placeholder="Rajesh Singh" />
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 2 - Role</label>
+          <input type="text" id="test_2_role" placeholder="CFO — Manufacturing Group" />
+        </div>
+
+        <div class="admin-field admin-field--full">
+          <label>Testimonial 3 - Quote</label>
+          <textarea id="test_3_quote" placeholder="Quote text here..."></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 3 - Name</label>
+          <input type="text" id="test_3_name" placeholder="Neha Patel" />
+        </div>
+        <div class="admin-field">
+          <label>Testimonial 3 - Role</label>
+          <input type="text" id="test_3_role" placeholder="Head of Real Estate — Financial Services" />
+        </div>
+      </form>
+    </section>
+
+    <!-- CLIENTS RIBBON SECTION -->
+    <section id="clients" class="admin-section">
+      <h2 class="admin-section-title">Clients Ribbon Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full">
+          <label>Section Heading</label>
+          <input type="text" id="clients_label" placeholder="Trusted by Leading Teams Across" />
+        </div>
+      </form>
+
+      <div style="margin-top: 2.5rem;">
+        <h3 style="font-size: 1rem; color: #FFFFFF; margin-bottom: 1rem; font-weight: 600;">Manage Client Logos</h3>
+        <div id="clients-list-container" style="display: grid; gap: 0.8rem; margin-bottom: 1.5rem;"></div>
+        <button id="add-client-btn" type="button" style="padding: 0.7rem 1.4rem; background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.40); border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s;">+ Add Client</button>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section id="faq" class="admin-section">
+      <h2 class="admin-section-title">FAQ Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full"><label>FAQ 1 - Question</label><input type="text" id="faq_1_q" placeholder="How quickly can we get a verified shortlist?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 1 - Answer</label><textarea id="faq_1_a" placeholder="We deliver..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>FAQ 2 - Question</label><input type="text" id="faq_2_q" placeholder="What does 'zero CapEx' actually mean?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 2 - Answer</label><textarea id="faq_2_a" placeholder="It means..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>FAQ 3 - Question</label><input type="text" id="faq_3_q" placeholder="Can we expand or downsize mid-lease?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 3 - Answer</label><textarea id="faq_3_a" placeholder="Yes..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>FAQ 4 - Question</label><input type="text" id="faq_4_q" placeholder="Who handles legal and due diligence?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 4 - Answer</label><textarea id="faq_4_a" placeholder="Our legal team..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>FAQ 5 - Question</label><input type="text" id="faq_5_q" placeholder="What's the typical deal closure timeline?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 5 - Answer</label><textarea id="faq_5_a" placeholder="7-14 days..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>FAQ 6 - Question</label><input type="text" id="faq_6_q" placeholder="Do you cover all 12 cities equally?" /></div>
+        <div class="admin-field admin-field--full"><label>FAQ 6 - Answer</label><textarea id="faq_6_a" placeholder="Yes..."></textarea></div>
+      </form>
+    </section>
+
+    <!-- PRICING SECTION -->
+    <section id="pricing" class="admin-section">
+      <h2 class="admin-section-title">Pricing Section</h2>
+      <form class="admin-form">
+        <h4 style="color: #FFFFFF; margin: 1.5rem 0 1rem; font-size: 0.95rem;">Starter Package</h4>
+        <div class="admin-field admin-field--full"><label>Title</label><input type="text" id="price_1_title" placeholder="Flex Desk Placement" /></div>
+        <div class="admin-field admin-field--full"><label>Description</label><textarea id="price_1_desc" placeholder="For small teams..."></textarea></div>
+        <div class="admin-field"><label>Feature 1</label><input type="text" id="price_1_f1" placeholder="Up to 50 seats" /></div>
+        <div class="admin-field"><label>Feature 2</label><input type="text" id="price_1_f2" placeholder="48-hour shortlist" /></div>
+        <div class="admin-field"><label>Feature 3</label><input type="text" id="price_1_f3" placeholder="Zero CapEx fit-outs" /></div>
+        <div class="admin-field"><label>Feature 4</label><input type="text" id="price_1_f4" placeholder="Month-to-month flexibility" /></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Professional Package (Most Popular)</h4>
+        <div class="admin-field admin-field--full"><label>Title</label><input type="text" id="price_2_title" placeholder="Managed Enterprise Floor" /></div>
+        <div class="admin-field admin-field--full"><label>Description</label><textarea id="price_2_desc" placeholder="For growing teams..."></textarea></div>
+        <div class="admin-field"><label>Feature 1</label><input type="text" id="price_2_f1" placeholder="50–500 seats" /></div>
+        <div class="admin-field"><label>Feature 2</label><input type="text" id="price_2_f2" placeholder="Custom-fitted spaces" /></div>
+        <div class="admin-field"><label>Feature 3</label><input type="text" id="price_2_f3" placeholder="Developer-funded CapEx" /></div>
+        <div class="admin-field"><label>Feature 4</label><input type="text" id="price_2_f4" placeholder="Flexible lease terms (2–5 yrs)" /></div>
+        <div class="admin-field"><label>Feature 5</label><input type="text" id="price_2_f5" placeholder="Ongoing facility optimization" /></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Enterprise Package</h4>
+        <div class="admin-field admin-field--full"><label>Title</label><input type="text" id="price_3_title" placeholder="Campus / HQ Solutions" /></div>
+        <div class="admin-field admin-field--full"><label>Description</label><textarea id="price_3_desc" placeholder="For enterprises..."></textarea></div>
+        <div class="admin-field"><label>Feature 1</label><input type="text" id="price_3_f1" placeholder="500+ seats across cities" /></div>
+        <div class="admin-field"><label>Feature 2</label><input type="text" id="price_3_f2" placeholder="Multi-floor coordination" /></div>
+        <div class="admin-field"><label>Feature 3</label><input type="text" id="price_3_f3" placeholder="Legal structuring & negotiation" /></div>
+        <div class="admin-field"><label>Feature 4</label><input type="text" id="price_3_f4" placeholder="Ongoing portfolio management" /></div>
+      </form>
+    </section>
+
+    <!-- PROCESS SECTION -->
+    <section id="process" class="admin-section">
+      <h2 class="admin-section-title">Process / Timeline Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full"><label>Step 1 - Title</label><input type="text" id="proc_1_title" placeholder="Intake & Brief" /></div>
+        <div class="admin-field admin-field--full"><label>Step 1 - Description</label><textarea id="proc_1_desc" placeholder="Share your headcount..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>Step 2 - Title</label><input type="text" id="proc_2_title" placeholder="48-Hour Shortlist" /></div>
+        <div class="admin-field admin-field--full"><label>Step 2 - Description</label><textarea id="proc_2_desc" placeholder="Receive a verified..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>Step 3 - Title</label><input type="text" id="proc_3_title" placeholder="Site Visits & Selection" /></div>
+        <div class="admin-field admin-field--full"><label>Step 3 - Description</label><textarea id="proc_3_desc" placeholder="Walk properties..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>Step 4 - Title</label><input type="text" id="proc_4_title" placeholder="Legal & Due Diligence" /></div>
+        <div class="admin-field admin-field--full"><label>Step 4 - Description</label><textarea id="proc_4_desc" placeholder="Our legal team..."></textarea></div>
+        <div class="admin-field admin-field--full"><label>Step 5 - Title</label><input type="text" id="proc_5_title" placeholder="Move-In & Optimization" /></div>
+        <div class="admin-field admin-field--full"><label>Step 5 - Description</label><textarea id="proc_5_desc" placeholder="Handover, fit-out..."></textarea></div>
+      </form>
+    </section>
+
+    <!-- CASE STUDIES SECTION -->
+    <section id="case-studies" class="admin-section">
+      <h2 class="admin-section-title">Case Studies Section</h2>
+      <form class="admin-form">
+        <h4 style="color: #FFFFFF; margin: 1rem 0; font-size: 0.95rem;">Case Study 1</h4>
+        <div class="admin-field"><label>Industry</label><input type="text" id="case_1_industry" placeholder="Tech Startup" /></div>
+        <div class="admin-field"><label>Company Name</label><input type="text" id="case_1_company" placeholder="Rapid-Scale SaaS Unicorn" /></div>
+        <div class="admin-field admin-field--full"><label>Challenge</label><textarea id="case_1_challenge" placeholder="Headcount tripled..."></textarea></div>
+        <div class="admin-field"><label>Metric 1 - Value</label><input type="text" id="case_1_m1_val" placeholder="7 days" /></div>
+        <div class="admin-field"><label>Metric 1 - Label</label><input type="text" id="case_1_m1_label" placeholder="Closure to lease signature" /></div>
+        <div class="admin-field"><label>Metric 2 - Value</label><input type="text" id="case_1_m2_val" placeholder="₹35L/mo" /></div>
+        <div class="admin-field"><label>Metric 2 - Label</label><input type="text" id="case_1_m2_label" placeholder="Monthly cost reduction" /></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Case Study 2</h4>
+        <div class="admin-field"><label>Industry</label><input type="text" id="case_2_industry" placeholder="Manufacturing" /></div>
+        <div class="admin-field"><label>Company Name</label><input type="text" id="case_2_company" placeholder="Global Operations HQ" /></div>
+        <div class="admin-field admin-field--full"><label>Challenge</label><textarea id="case_2_challenge" placeholder="Consolidating 4..."></textarea></div>
+        <div class="admin-field"><label>Metric 1 - Value</label><input type="text" id="case_2_m1_val" placeholder="₹2.5Cr" /></div>
+        <div class="admin-field"><label>Metric 1 - Label</label><input type="text" id="case_2_m1_label" placeholder="Total CapEx avoided" /></div>
+        <div class="admin-field"><label>Metric 2 - Value</label><input type="text" id="case_2_m2_val" placeholder="Zero" /></div>
+        <div class="admin-field"><label>Metric 2 - Label</label><input type="text" id="case_2_m2_label" placeholder="Legal surprises" /></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Case Study 3</h4>
+        <div class="admin-field"><label>Industry</label><input type="text" id="case_3_industry" placeholder="Financial Services" /></div>
+        <div class="admin-field"><label>Company Name</label><input type="text" id="case_3_company" placeholder="Global Trade Desk" /></div>
+        <div class="admin-field admin-field--full"><label>Challenge</label><textarea id="case_3_challenge" placeholder="Expansion across 5..."></textarea></div>
+        <div class="admin-field"><label>Metric 1 - Value</label><input type="text" id="case_3_m1_val" placeholder="5 cities" /></div>
+        <div class="admin-field"><label>Metric 1 - Label</label><input type="text" id="case_3_m1_label" placeholder="Launched simultaneously" /></div>
+        <div class="admin-field"><label>Metric 2 - Value</label><input type="text" id="case_3_m2_val" placeholder="1 POC" /></div>
+        <div class="admin-field"><label>Metric 2 - Label</label><input type="text" id="case_3_m2_label" placeholder="For all real estate needs" /></div>
+      </form>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section id="team" class="admin-section">
+      <h2 class="admin-section-title">Team Section</h2>
+      <form class="admin-form">
+        <h4 style="color: #FFFFFF; margin: 1rem 0; font-size: 0.95rem;">Team Member 1</h4>
+        <div class="admin-field"><label>Name</label><input type="text" id="team_1_name" placeholder="Vikram Sharma" /></div>
+        <div class="admin-field"><label>Title</label><input type="text" id="team_1_title" placeholder="Co-Founder & CEO" /></div>
+        <div class="admin-field admin-field--full"><label>Bio</label><textarea id="team_1_bio" placeholder="15+ years..."></textarea></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Team Member 2</h4>
+        <div class="admin-field"><label>Name</label><input type="text" id="team_2_name" placeholder="Priya Desai" /></div>
+        <div class="admin-field"><label>Title</label><input type="text" id="team_2_title" placeholder="Co-Founder & COO" /></div>
+        <div class="admin-field admin-field--full"><label>Bio</label><textarea id="team_2_bio" placeholder="Legal expert..."></textarea></div>
+
+        <h4 style="color: #FFFFFF; margin: 2rem 0 1rem; font-size: 0.95rem;">Team Member 3</h4>
+        <div class="admin-field"><label>Name</label><input type="text" id="team_3_name" placeholder="Rajesh Kumar" /></div>
+        <div class="admin-field"><label>Title</label><input type="text" id="team_3_title" placeholder="VP, Vendor Relations" /></div>
+        <div class="admin-field admin-field--full"><label>Bio</label><textarea id="team_3_bio" placeholder="Direct relationships..."></textarea></div>
+      </form>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="admin-section">
+      <h2 class="admin-section-title">About Section</h2>
+      <form class="admin-form">
+        <div class="admin-field admin-field--full">
+          <label>About Headline</label>
+          <input type="text" id="about_headline" placeholder="We're Your Extended Infrastructure Team." />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>About Paragraph 1</label>
+          <textarea id="about_p1" placeholder="At Billionaires Bay Global Realty..."></textarea>
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>About Paragraph 2</label>
+          <textarea id="about_p2" placeholder="Whether your immediate mandate..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- CONTACT & CTA SECTION -->
+    <section id="contact" class="admin-section">
+      <h2 class="admin-section-title">Contact &amp; CTA Section</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>WhatsApp Number (format: 919205005399)</label>
+          <input type="tel" id="whatsapp_num" placeholder="919205005399" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>CTA Headline</label>
+          <input type="text" id="cta_headline" placeholder="Take the Work Off Your Desk." />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>CTA Body Text</label>
+          <textarea id="cta_body" placeholder="Send us your rough headcount..."></textarea>
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>CTA Footnote</label>
+          <textarea id="cta_footnote" placeholder="Are you open to a brief..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- FOOTER SECTION -->
+    <section id="footer" class="admin-section">
+      <h2 class="admin-section-title">Footer Section</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>Footer Tagline</label>
+          <input type="text" id="footer_tagline" placeholder="Corporate Leasing & Workspace Advisory" />
+        </div>
+        <div class="admin-field">
+          <label>Footer Legal Name</label>
+          <input type="text" id="footer_legal" placeholder="Billionaires Bay Global Realty LLP" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Copyright Notice</label>
+          <input type="text" id="footer_copy" placeholder="© 2025 Billionaires Bay Global Realty LLP. All Rights Reserved." />
+        </div>
+      </form>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SPRINT 2: PROPERTY TOOLS (Features 9-14) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <section id="sprint2-prop" class="admin-section">
+      <h2 class="admin-section-title">Sprint 2: Property Management Tools</h2>
+      <form class="admin-form">
+        <!-- Feature 9: Virtual Tours -->
+        <div class="admin-field">
+          <label>Virtual Tours - Title</label>
+          <input type="text" id="virt_tours_title" placeholder="360° Virtual Tours" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Virtual Tours - Description</label>
+          <textarea id="virt_tours_desc" placeholder="Walk through properties in immersive 3D..."></textarea>
+        </div>
+
+        <!-- Feature 10: Floor Plans -->
+        <div class="admin-field">
+          <label>Floor Plans - Title</label>
+          <input type="text" id="floor_plans_title" placeholder="Interactive Floor Plans" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Floor Plans - Description</label>
+          <textarea id="floor_plans_desc" placeholder="Detailed CAD layouts with zone mapping..."></textarea>
+        </div>
+
+        <!-- Feature 11: E-Signature -->
+        <div class="admin-field">
+          <label>E-Signature - Title</label>
+          <input type="text" id="esign_title" placeholder="Digital Lease Signing" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>E-Signature - Description</label>
+          <textarea id="esign_desc" placeholder="Sign leases electronically..."></textarea>
+        </div>
+
+        <!-- Feature 12: Document Library -->
+        <div class="admin-field">
+          <label>Document Library - Title</label>
+          <input type="text" id="doc_lib_title" placeholder="Compliance Document Hub" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Document Library - Description</label>
+          <textarea id="doc_lib_desc" placeholder="Access templates, regulatory docs..."></textarea>
+        </div>
+
+        <!-- Feature 13: Property Alerts -->
+        <div class="admin-field">
+          <label>Property Alerts - Title</label>
+          <input type="text" id="alerts_title" placeholder="Real-Time Property Alerts" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Property Alerts - Description</label>
+          <textarea id="alerts_desc" placeholder="Get notified instantly when..."></textarea>
+        </div>
+
+        <!-- Feature 14: Video Consultation -->
+        <div class="admin-field">
+          <label>Video Consultation - Title</label>
+          <input type="text" id="video_consult_title" placeholder="Live Video Walkthroughs" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Video Consultation - Description</label>
+          <textarea id="video_consult_desc" placeholder="Real-time video calls with property managers..."></textarea>
+        </div>
+
+        <!-- Feature 15: Market Analytics -->
+        <div class="admin-field">
+          <label>Market Analytics - Title</label>
+          <input type="text" id="market_analytics_title" placeholder="Market Analytics & Trends" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Market Analytics - Description</label>
+          <textarea id="market_analytics_desc" placeholder="Real-time pricing data, occupancy trends..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SPRINT 2: FINANCIAL & ADVANCED TOOLS (Features 16-22) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <section id="sprint2-fin" class="admin-section">
+      <h2 class="admin-section-title">Sprint 2: Financial & Advanced Tools</h2>
+      <form class="admin-form">
+        <!-- Feature 16: Financing -->
+        <div class="admin-field">
+          <label>Financing Options - Title</label>
+          <input type="text" id="financing_title" placeholder="Flexible Financing Options" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Financing Options - Description</label>
+          <textarea id="financing_desc" placeholder="Lease structuring, payment plans..."></textarea>
+        </div>
+
+        <!-- Feature 17: Referral -->
+        <div class="admin-field">
+          <label>Referral Program - Title</label>
+          <input type="text" id="referral_title" placeholder="Partner Referral Program" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Referral Program - Description</label>
+          <textarea id="referral_desc" placeholder="Refer a corporate client..."></textarea>
+        </div>
+
+        <!-- Feature 18: Whitepapers -->
+        <div class="admin-field">
+          <label>Whitepapers - Title</label>
+          <input type="text" id="wp_title" placeholder="Industry Whitepapers" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Whitepapers - Description</label>
+          <textarea id="wp_desc" placeholder="Exclusive research on corporate real estate..."></textarea>
+        </div>
+
+        <!-- Feature 19: Advanced Filtering -->
+        <div class="admin-field">
+          <label>Advanced Filtering - Title</label>
+          <input type="text" id="filter_title" placeholder="AI-Powered Search Filters" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Advanced Filtering - Description</label>
+          <textarea id="filter_desc" placeholder="Filter by budget, location, amenities..."></textarea>
+        </div>
+
+        <!-- Feature 20: Portfolio Tracker -->
+        <div class="admin-field">
+          <label>Portfolio Dashboard - Title</label>
+          <input type="text" id="portfolio_title" placeholder="Lease Portfolio Dashboard" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Portfolio Dashboard - Description</label>
+          <textarea id="portfolio_desc" placeholder="Track all active leases..."></textarea>
+        </div>
+
+        <!-- Feature 21: Compliance -->
+        <div class="admin-field">
+          <label>Compliance Automation - Title</label>
+          <input type="text" id="compliance_title" placeholder="Automated Compliance Tracking" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>Compliance Automation - Description</label>
+          <textarea id="compliance_desc" placeholder="Automatic reminders for regulatory filings..."></textarea>
+        </div>
+
+        <!-- Feature 22: Sustainability -->
+        <div class="admin-field">
+          <label>ESG & Sustainability - Title</label>
+          <input type="text" id="sustain_title" placeholder="ESG & Sustainability Ratings" />
+        </div>
+        <div class="admin-field admin-field--full">
+          <label>ESG & Sustainability - Description</label>
+          <textarea id="sustain_desc" placeholder="See green certifications, carbon footprint..."></textarea>
+        </div>
+      </form>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- SPRINT 2: TIER 3 ROADMAP (Coming Soon Features) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <section id="sprint2-roadmap" class="admin-section">
+      <h2 class="admin-section-title">Sprint 2: Tier 3 Roadmap (Coming Soon)</h2>
+      <form class="admin-form">
+        <div class="admin-field">
+          <label>Feature 1 - Title</label>
+          <input type="text" id="tier3_f1_title" placeholder="AI Property Matching" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 1 - Description</label>
+          <input type="text" id="tier3_f1_desc" placeholder="ML-powered recommendations based on your company DNA" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 2 - Title</label>
+          <input type="text" id="tier3_f2_title" placeholder="Predictive Analytics" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 2 - Description</label>
+          <input type="text" id="tier3_f2_desc" placeholder="Forecast market trends 6 months ahead" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 3 - Title</label>
+          <input type="text" id="tier3_f3_title" placeholder="Advanced Reporting" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 3 - Description</label>
+          <input type="text" id="tier3_f3_desc" placeholder="Custom dashboards and BI integration" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 4 - Title</label>
+          <input type="text" id="tier3_f4_title" placeholder="API Integration" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 4 - Description</label>
+          <input type="text" id="tier3_f4_desc" placeholder="Sync with your ERP, HCM, and finance systems" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 5 - Title</label>
+          <input type="text" id="tier3_f5_title" placeholder="Global Expansion" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 5 - Description</label>
+          <input type="text" id="tier3_f5_desc" placeholder="Coverage expanding to Singapore, HK, London" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 6 - Title</label>
+          <input type="text" id="tier3_f6_title" placeholder="Tenant Communities" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 6 - Description</label>
+          <input type="text" id="tier3_f6_desc" placeholder="Network with 500+ corporate tenants" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 7 - Title</label>
+          <input type="text" id="tier3_f7_title" placeholder="White Label Solutions" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 7 - Description</label>
+          <input type="text" id="tier3_f7_desc" placeholder="Reseller program for brokers & advisors" />
+        </div>
+
+        <div class="admin-field">
+          <label>Feature 8 - Title</label>
+          <input type="text" id="tier3_f8_title" placeholder="Enterprise Customization" />
+        </div>
+        <div class="admin-field">
+          <label>Feature 8 - Description</label>
+          <input type="text" id="tier3_f8_desc" placeholder="Custom workflows for your org" />
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { loadCMS, saveCMS, DEFAULTS } from './src/cms.js';
+
+    const CMS_KEY = 'bayworks_cms';
+    const navBtns = document.querySelectorAll('.admin-nav-btn');
+    const sections = document.querySelectorAll('.admin-section');
+    const saveBtn = document.getElementById('save-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const statusEl = document.getElementById('status');
+
+    // Client management
+    function renderClientsList() {
+      const data = loadCMS();
+      let clients = [];
+      try {
+        clients = JSON.parse(data.clients_list || '[]');
+      } catch(e) { clients = []; }
+
+      const container = document.getElementById('clients-list-container');
+      container.innerHTML = clients.map((client, idx) => `
+        <div style="display: flex; gap: 0.5rem; align-items: stretch;">
+          <input type="text" value="${client.replace(/"/g, '&quot;')}"
+            data-client-idx="${idx}" class="client-input"
+            style="flex: 1; padding: 0.7rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #FFFFFF; font-family: Outfit, sans-serif; outline: none;" />
+          <button type="button" class="remove-client" data-idx="${idx}"
+            style="padding: 0.7rem 1rem; background: rgba(239,68,68,0.15); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.30); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">Remove</button>
+        </div>
+      `).join('');
+
+      // Event listeners for remove buttons
+      container.querySelectorAll('.remove-client').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const idx = parseInt(btn.dataset.idx);
+          clients.splice(idx, 1);
+          const data = loadCMS();
+          data.clients_list = JSON.stringify(clients);
+          saveCMS(data);
+          renderClientsList();
+          showStatus('Client removed. Saved.', 'success');
+        });
+      });
+    }
+
+    // Load CMS data into form
+    function loadForm() {
+      const data = loadCMS();
+      Object.entries(data).forEach(([key, val]) => {
+        const input = document.getElementById(key);
+        if (input && key !== 'clients_list') input.value = val;
+      });
+      renderClientsList();
+    }
+
+    // Save form data
+    function saveForm() {
+      const data = {};
+      document.querySelectorAll('input, textarea').forEach(el => {
+        if (el.id && el.id !== 'clients_list') data[el.id] = el.value;
+      });
+      // Handle clients list separately
+      const clientInputs = document.querySelectorAll('.client-input');
+      if (clientInputs.length > 0) {
+        const clients = Array.from(clientInputs).map(el => el.value).filter(c => c.trim());
+        data.clients_list = JSON.stringify(clients);
+      }
+      saveCMS(data);
+      showStatus('Saved successfully! Changes live in 5 seconds.', 'success');
+    }
+
+    // Reset to defaults
+    function resetForm() {
+      if (!confirm('Reset all content to defaults?')) return;
+      localStorage.removeItem(CMS_KEY);
+      loadForm();
+      showStatus('Reset to defaults.', 'success');
+    }
+
+    // Show status message
+    function showStatus(msg, type = 'success') {
+      statusEl.textContent = msg;
+      statusEl.className = `admin-status show ${type}`;
+      setTimeout(() => statusEl.classList.remove('show'), 4000);
+    }
+
+    // Section navigation
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navBtns.forEach(b => b.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        const sectionId = btn.dataset.section;
+        document.getElementById(sectionId)?.classList.add('active');
+      });
+    });
+
+    // Event listeners
+    saveBtn.addEventListener('click', saveForm);
+    resetBtn.addEventListener('click', resetForm);
+
+    // Add client button
+    document.getElementById('add-client-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const data = loadCMS();
+      let clients = [];
+      try {
+        clients = JSON.parse(data.clients_list || '[]');
+      } catch(e) { clients = []; }
+      clients.push('New Client');
+      data.clients_list = JSON.stringify(clients);
+      saveCMS(data);
+      renderClientsList();
+      showStatus('Client added.', 'success');
+    });
+
+    // Auto-save on input (debounced)
+    let autoSaveTimer;
+    function setupAutoSave() {
+      document.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('change', () => {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(() => {
+            saveForm();
+            // Reload main site preview if open
+            const mainWindow = window.opener;
+            if (mainWindow) mainWindow.location.reload();
+          }, 1000);
+        });
+      });
+    }
+    setupAutoSave();
+
+    // Load on startup
+    loadForm();
+  </script>
+
+</body>
+</html>
