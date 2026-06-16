@@ -1,9 +1,21 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 // The marketing site talks to the BAYWORKS CRM through a same-origin dev proxy,
 // so the browser never hits a cross-origin (CORS) boundary in development.
 // `/crm-api/*` on :5173  →  `http://localhost:3001/api/*`
 export default defineConfig({
+  // Multi-page app: each HTML entry is its own page/route.
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        properties: resolve(__dirname, 'properties.html'),
+        about: resolve(__dirname, 'about.html'),
+        admin: resolve(__dirname, 'admin.html'),
+      },
+    },
+  },
   server: {
     proxy: {
       '/crm-api': {
