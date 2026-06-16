@@ -2,6 +2,15 @@
 
 export const CMS_KEY = 'bayworks_cms';
 
+// Single source of truth for instant-quote pricing (₹ per sq ft / month).
+// The quote dropdown + price math both read from here, so they can never drift.
+export const QUOTE_PRICES = {
+  Gurugram:  85,
+  Mumbai:    95,
+  Bengaluru: 65,
+  Hyderabad: 55,
+};
+
 // Mock/sample brand logos (fictional) — used as defaults and the admin "sample logos" button
 export const MOCK_LOGOS = [
   { name: 'Nexora',      logo: '/logos/nexora.svg' },
@@ -312,23 +321,69 @@ export function applyCMS() {
       clientsContainer.innerHTML = html;
     } catch(e) { console.error('Failed to parse clients_list:', e); }
   }
-  // Render available properties from list
+  // ── Available properties: cards, booking dropdown, quote pricing ──
+  const esc = (s) => String(s ?? '').replace(/"/g, '&quot;');
+  const PIN_SVG = '<svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-map-pin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>';
+  const RULER_SVG = '<svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-ruler" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>';
+
+  let props = [];
+  try { props = JSON.parse(d.properties_list || '[]'); }
+  catch (e) { console.error('Failed to parse properties_list:', e); }
+
+  // Expose for the detail modal (main.js reads window.__BAYWORKS_PROPS[idx])
+  window.__BAYWORKS_PROPS = props;
+
+  let favs = [];
+  try { favs = JSON.parse(localStorage.getItem('bayworks_favorites') || '[]'); } catch { favs = []; }
+  const HEART_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+
   const propsGrid = document.getElementById('properties-grid');
-  if (propsGrid && d.properties_list) {
-    try {
-      const props = JSON.parse(d.properties_list);
-      propsGrid.innerHTML = props.map(p => {
-        const search = `${p.name} ${p.city} ${p.type}`.toLowerCase();
-        return `<div class="property-card" data-city="${p.city || ''}" data-size="${p.bucket || ''}" data-search="${search}">
-          <span class="property-status">${p.status || 'Available'}</span>
+  if (propsGrid) {
+    const waNum = d.whatsapp_num || '919205005399';
+    propsGrid.innerHTML = props.map((p, i) => {
+      const search = `${p.name} ${p.city} ${p.type}`.toLowerCase();
+      const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];
+      const isFav = favs.includes(p.name);
+      const priceNum = parseFloat((String(p.price).replace(/,/g, '').match(/[\d.]+/) || [0])[0]) || 0;
+      const sqftNum  = parseFloat((String(p.size).replace(/,/g, '').match(/[\d.]+/) || [0])[0]) || 0;
+      const img = p.image
+        ? `<div class="property-img"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" /></div>`
+        : `<div class="property-img property-img--empty">${PIN_SVG}<span>${esc(p.city || 'Property')}</span></div>`;
+      const waMsg = encodeURIComponent(`Hi BAYWORKS, I'm interested in "${p.name || 'a property'}" (${p.city || ''}). Please share details.`);
+      return `<article class="property-card${isFav ? ' is-fav' : ''}" data-idx="${i}" data-name="${esc(p.name)}" data-city="${esc(p.city)}" data-size="${esc(p.bucket)}" data-price="${priceNum}" data-sqft="${sqftNum}" data-search="${esc(search)}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
+        <button type="button" class="fav-btn" data-fav="${esc(p.name)}" aria-label="Save ${esc(p.name)}" aria-pressed="${isFav}">${HEART_SVG}</button>
+        ${img}
+        <div class="property-body">
+          <span class="property-status status--${statusSlug}">${p.status || 'Available'}</span>
           <h3>${p.name || ''}</h3>
-          <p><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-map-pin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /> </svg> ${p.city || ''}</p>
-          <p><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-ruler" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" /> <path d="m14.5 12.5 2-2" /> <path d="m11.5 9.5 2-2" /> <path d="m8.5 6.5 2-2" /> <path d="m17.5 15.5 2-2" /> </svg> ${p.size || ''} · ${p.type || ''}</p>
+          <p>${PIN_SVG} ${p.city || ''}</p>
+          <p>${RULER_SVG} ${p.size || ''} · ${p.type || ''}</p>
           <div class="property-price">${p.price || ''}</div>
-        </div>`;
-      }).join('');
-      // Re-run filters if the page has them wired up
-      if (typeof window.filterProperties === 'function') window.filterProperties();
-    } catch(e) { console.error('Failed to parse properties_list:', e); }
+          <div class="property-actions">
+            <button type="button" class="btn-primary btn-sm" data-action="book" data-idx="${i}">Book Tour</button>
+            <a class="btn-ghost btn-sm" data-action="wa" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+    // Re-run filters if the page has them wired up
+    if (typeof window.filterProperties === 'function') window.filterProperties();
+  }
+
+  // #4 — Booking property dropdown sourced from the live inventory
+  const bookingSelect = document.getElementById('booking-property');
+  if (bookingSelect && props.length) {
+    bookingSelect.innerHTML = props.map(p =>
+      `<option data-city="${esc(p.city)}">${esc(p.name)} — ${esc(p.city)} (${esc(p.size)})</option>`
+    ).join('');
+  }
+
+  // #8 — Quote city dropdown + pricing from the single QUOTE_PRICES source
+  const quoteCity = document.getElementById('quote-city');
+  if (quoteCity) {
+    quoteCity.innerHTML = '<option value="">Select city</option>' +
+      Object.entries(QUOTE_PRICES).map(([city, price]) =>
+        `<option data-price="${price}">${city}</option>`
+      ).join('');
   }
 }

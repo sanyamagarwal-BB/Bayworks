@@ -1,14 +1,29 @@
 /* BAYWORKS — Main JS */
 import { applyCMS } from './cms.js';
 import { initCity } from './city.js';
+import { captureLead, flushLeadQueue } from './crm.js';
+import { track } from './analytics.js';
 
-// Hero brief form — redirects to WhatsApp with pre-filled message
+// Hero brief form — captures the lead to CRM, then opens WhatsApp pre-filled
 window.handleHeroBrief = function(e) {
   e.preventDefault();
   const f = e.target;
   const seats = f.seats.value || 'Not specified';
   const city  = f.city.value  || 'Not specified';
   const phone = f.phone.value || '';
+
+  // Fire-and-forget lead capture (queues locally if CRM is down)
+  captureLead({
+    name: phone ? `Web enquiry (${phone})` : 'Website enquiry',
+    phone,
+    city: city === 'Not specified' ? undefined : city,
+    budget: seats === 'Not specified' ? undefined : `${seats} seats`,
+    intent: 'WARM',
+    source: 'website_hero',
+    utm: { source: 'website', medium: 'hero_form', campaign: 'corporate_leasing' },
+  });
+  track('lead_captured', { source: 'website_hero' });
+
   const msg = encodeURIComponent(
     `Hi BAYWORKS, I need office space:\n• Seats: ${seats}\n• City: ${city}\n• My number: ${phone}\n\nPlease send me a shortlist.`
   );
@@ -23,7 +38,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initFAQ();
   initProperties();
   initHeroBackground();
+  initPropertyModal();
+  initComingSoon();
+  flushLeadQueue();   // retry any leads queued while the CRM was unreachable
+  track('page_view', { title: document.title });
 });
+
+/* ── SPRINT-2 FEATURES: honest "Coming soon" treatment ─────────── */
+function initComingSoon() {
+  document.querySelectorAll('.feature-card-row').forEach(row => {
+    const title = row.querySelector('.feature-title');
+    if (title && !title.querySelector('.coming-soon-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'coming-soon-badge';
+      badge.textContent = 'Coming soon';
+      title.appendChild(badge);
+    }
+    // Turn the dead "Coming Soon" CTAs into clearly non-interactive labels
+    row.querySelectorAll('button.btn-secondary').forEach(btn => {
+      if (/coming soon/i.test(btn.textContent)) {
+        btn.disabled = true;
+        btn.classList.add('is-coming-soon');
+        btn.setAttribute('aria-disabled', 'true');
+      }
+    });
+  });
+}
 
 /* ── HERO BACKGROUND: real video → 3D city → gradient ──────────── */
 function initHeroBackground() {
@@ -51,31 +91,205 @@ function initHeroBackground() {
   setTimeout(() => { if (!decided && video.readyState < 2) useCity(); }, 2500);
 }
 
-/* ── PROPERTIES: search + city + size filtering ───────────────── */
+/* ── FAVORITES (localStorage, no account needed) ──────────────── */
+const FAV_KEY = 'bayworks_favorites';
+function getFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; } }
+function setFavs(arr) { localStorage.setItem(FAV_KEY, JSON.stringify(arr)); updateFavCount(); }
+function toggleFav(name) {
+  const f = getFavs();
+  const i = f.indexOf(name);
+  if (i >= 0) f.splice(i, 1); else f.push(name);
+  setFavs(f);
+  return f.includes(name);
+}
+function updateFavCount() {
+  const el = document.getElementById('fav-count');
+  if (el) el.textContent = getFavs().length;
+}
+
+/* ── PROPERTIES: search · filter · sort · favorites · load-more ── */
+const PAGE_SIZE = 6;
+let favOnly = false;
+let visibleLimit = PAGE_SIZE;
+
 function initProperties() {
   const grid   = document.getElementById('properties-grid');
   const search = document.getElementById('prop-search');
   const city   = document.getElementById('prop-city');
   const size   = document.getElementById('prop-size');
+  const sort   = document.getElementById('prop-sort');
+  const meta   = document.getElementById('properties-meta');
+  const empty  = document.getElementById('properties-empty');
+  const loadmore = document.getElementById('properties-loadmore');
+  const loadBtn  = document.getElementById('load-more');
+  const favBtn   = document.getElementById('fav-filter');
+  const clearBtn = document.getElementById('clear-filters');
   if (!grid) return;
 
-  // Exposed so cms.js can re-filter after (re)rendering cards
+  const num = (v) => parseFloat(v) || 0;
+
+  // Exposed so cms.js can re-apply after (re)rendering cards
   window.filterProperties = function () {
     const q = (search?.value || '').trim().toLowerCase();
     const c = city?.value || '';
     const s = size?.value || '';
-    grid.querySelectorAll('.property-card').forEach(card => {
+    const mode = sort?.value || '';
+    const favs = getFavs();
+    const all = [...grid.querySelectorAll('.property-card')];
+
+    let matched = all.filter(card => {
       const matchSearch = !q || (card.dataset.search || '').includes(q);
       const matchCity   = !c || card.dataset.city === c;
       const matchSize   = !s || card.dataset.size === s;
-      card.classList.toggle('is-hidden', !(matchSearch && matchCity && matchSize));
+      const matchFav    = !favOnly || favs.includes(card.dataset.name);
+      return matchSearch && matchCity && matchSize && matchFav;
     });
+
+    if (mode) {
+      const [key, dir] = mode.split('-');
+      const dataKey = key === 'size' ? 'sqft' : key;   // numeric sqft, not the bucket label
+      const sign = dir === 'desc' ? -1 : 1;
+      matched.sort((a, b) => sign * (num(a.dataset[dataKey]) - num(b.dataset[dataKey])));
+    }
+
+    // Hide everything, reorder matched, then reveal up to the current limit
+    all.forEach(c => c.classList.add('is-hidden'));
+    matched.forEach(c => grid.appendChild(c));
+    matched.slice(0, visibleLimit).forEach(c => c.classList.remove('is-hidden'));
+
+    const shown = Math.min(matched.length, visibleLimit);
+    if (meta) meta.textContent = matched.length
+      ? `Showing ${shown} of ${matched.length}${matched.length !== all.length ? ` matching` : ''} ${matched.length === 1 ? 'property' : 'properties'}`
+      : '';
+    if (empty) empty.hidden = matched.length > 0;
+    if (loadmore) loadmore.hidden = matched.length <= visibleLimit;
   };
 
-  search?.addEventListener('input',  window.filterProperties);
-  city?.addEventListener('change',   window.filterProperties);
-  size?.addEventListener('change',   window.filterProperties);
+  const reapply = () => { visibleLimit = PAGE_SIZE; window.filterProperties(); };
+
+  search?.addEventListener('input', reapply);
+  city?.addEventListener('change', () => { reapply(); track('property_filter', { field: 'city', value: city.value }); });
+  size?.addEventListener('change', () => { reapply(); track('property_filter', { field: 'size', value: size.value }); });
+  sort?.addEventListener('change', () => { reapply(); track('property_sort', { value: sort.value }); });
+
+  loadBtn?.addEventListener('click', () => {
+    visibleLimit += PAGE_SIZE;
+    window.filterProperties();
+    track('property_load_more', { limit: visibleLimit });
+  });
+
+  favBtn?.addEventListener('click', () => {
+    favOnly = !favOnly;
+    favBtn.classList.toggle('is-active', favOnly);
+    favBtn.setAttribute('aria-pressed', String(favOnly));
+    reapply();
+    track('property_fav_filter', { on: favOnly });
+  });
+
+  clearBtn?.addEventListener('click', () => {
+    if (search) search.value = '';
+    if (city) city.value = '';
+    if (size) size.value = '';
+    if (sort) sort.value = '';
+    favOnly = false;
+    favBtn?.classList.remove('is-active');
+    favBtn?.setAttribute('aria-pressed', 'false');
+    reapply();
+  });
+
+  // Favorite toggle (event delegation — cards are re-rendered by the CMS)
+  grid.addEventListener('click', (e) => {
+    const favTrigger = e.target.closest('.fav-btn');
+    if (!favTrigger) return;
+    e.stopPropagation();
+    const name = favTrigger.dataset.fav;
+    const saved = toggleFav(name);
+    favTrigger.setAttribute('aria-pressed', String(saved));
+    favTrigger.closest('.property-card')?.classList.toggle('is-fav', saved);
+    if (favOnly) reapply();
+    track('property_favorite', { name, saved });
+  });
+
+  updateFavCount();
   window.filterProperties();
+}
+
+/* ── PROPERTY CARDS: per-card CTAs + detail modal ──────────────── */
+function initPropertyModal() {
+  const grid   = document.getElementById('properties-grid');
+  const dialog = document.getElementById('property-modal');
+  if (!grid || !dialog) return;
+
+  grid.addEventListener('click', (e) => {
+    if (e.target.closest('.fav-btn')) return;            // favorite toggle handled elsewhere
+    const bookBtn = e.target.closest('[data-action="book"]');
+    if (bookBtn) { e.stopPropagation(); bookTour(+bookBtn.dataset.idx); return; }
+    if (e.target.closest('[data-action="wa"]')) {
+      const card = e.target.closest('.property-card');
+      track('property_whatsapp', { name: card?.dataset.name });
+      return; // let the WhatsApp link open
+    }
+    const card = e.target.closest('.property-card');
+    if (card) openPropertyModal(+card.dataset.idx);
+  });
+
+  grid.addEventListener('keydown', (e) => {
+    const card = e.target.closest('.property-card');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openPropertyModal(+card.dataset.idx); }
+  });
+
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+  dialog.querySelector('[data-modal-close]')?.addEventListener('click', () => dialog.close());
+}
+
+function openPropertyModal(idx) {
+  const p = (window.__BAYWORKS_PROPS || [])[idx];
+  const dialog = document.getElementById('property-modal');
+  if (!p || !dialog) return;
+
+  const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];
+  const waMsg = encodeURIComponent(`Hi BAYWORKS, I'm interested in "${p.name || 'a property'}" (${p.city || ''}). Please share details.`);
+  const img = p.image
+    ? `<img src="${p.image}" alt="${p.name || ''}" />`
+    : `<div class="property-modal-img--empty">${p.city || 'Property'}</div>`;
+
+  dialog.querySelector('#property-modal-body').innerHTML = `
+    <div class="property-modal-img">${img}</div>
+    <div class="property-modal-info">
+      <span class="property-status status--${statusSlug}">${p.status || 'Available'}</span>
+      <h3>${p.name || ''}</h3>
+      <div class="property-modal-meta">
+        <div><span>City</span><strong>${p.city || '—'}</strong></div>
+        <div><span>Size</span><strong>${p.size || '—'}</strong></div>
+        <div><span>Type</span><strong>${p.type || '—'}</strong></div>
+        <div><span>Price</span><strong>${p.price || '—'}</strong></div>
+      </div>
+      <div class="property-modal-actions">
+        <button type="button" class="btn-primary" data-modal-book>Book a Tour</button>
+        <a class="btn-ghost" href="https://wa.me/919205005399?text=${waMsg}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+      </div>
+    </div>`;
+
+  dialog.querySelector('[data-modal-book]')?.addEventListener('click', () => { dialog.close(); bookTour(idx); });
+  dialog.showModal();
+  track('property_view', { name: p.name, city: p.city });
+}
+
+function bookTour(idx) {
+  const p = (window.__BAYWORKS_PROPS || [])[idx];
+  if (!p) return;
+  track('book_tour_click', { name: p.name });
+  const select = document.getElementById('booking-property');
+  if (select) {
+    const opt = [...select.options].find(o => o.textContent.startsWith(p.name));
+    if (opt) select.value = opt.value;
+  }
+  // Reset the booking form in case a previous booking left it on the success state
+  const form = document.querySelector('.booking-form');
+  const success = document.getElementById('booking-success');
+  if (form) form.style.display = '';
+  if (success) success.style.display = 'none';
+  document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── NAV: scroll class + mobile toggle ────────────────────────── */
@@ -91,8 +305,9 @@ function initNav() {
 
   // Hamburger
   hamburger?.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu?.classList.toggle('open');
+    const open = hamburger.classList.toggle('open');
+    mobileMenu?.classList.toggle('open', open);
+    nav?.classList.toggle('menu-open', open);
   });
 
   // Close mobile menu on link click
@@ -100,6 +315,7 @@ function initNav() {
     link.addEventListener('click', () => {
       hamburger?.classList.remove('open');
       mobileMenu?.classList.remove('open');
+      nav?.classList.remove('menu-open');
     });
   });
 }
@@ -213,6 +429,7 @@ document.getElementById('quote-btn')?.addEventListener('click', () => {
   document.getElementById('quote-display').textContent = '₹' + totalMonthly.toLocaleString();
   document.querySelector('.quote-form').style.display = 'none';
   document.getElementById('quote-result').style.display = 'block';
+  track('quote_generated', { city: city.value, size, duration, monthly: totalMonthly });
 });
 
 /* SAVINGS CALCULATOR */
@@ -255,10 +472,25 @@ document.getElementById('booking-confirm')?.addEventListener('click', () => {
     alert('Please fill all fields');
     return;
   }
-  
+
+  // A tour booking is a hot lead — push it to the CRM
+  const propEl = document.getElementById('booking-property');
+  const city = propEl?.selectedOptions?.[0]?.dataset.city || undefined;
+  captureLead({
+    name,
+    phone,
+    city,
+    intent: 'HOT',
+    source: 'website_booking',
+    budget: property,
+    utm: { source: 'website', medium: 'tour_booking', property, date, time },
+  });
+  track('lead_captured', { source: 'website_booking' });
+  track('tour_booked', { property, date, time });
+
   document.querySelector('.booking-form').style.display = 'none';
   document.getElementById('booking-success').style.display = 'block';
-  document.getElementById('booking-confirm-text').textContent = `${property} on ${date} at ${time}. Confirmation email sent to your WhatsApp.`;
+  document.getElementById('booking-confirm-text').textContent = `${property} on ${date} at ${time}. Our team will confirm on WhatsApp shortly.`;
 });
 
 /* LEAD QUALIFICATION QUIZ */
@@ -288,12 +520,14 @@ function showQuizResult(pkgType) {
   document.querySelectorAll('.quiz-question').forEach(q => q.style.display = 'none');
   document.getElementById('quiz-recommendation').textContent = recommendations[pkgType] || recommendations['pro'];
   document.getElementById('quiz-result').style.display = 'block';
+  track('quiz_completed', { recommendation: pkgType });
 }
 
 /* LIVE CHAT */
 document.getElementById('chat-open')?.addEventListener('click', () => {
   document.getElementById('chat-widget').classList.add('open');
   document.getElementById('chat-open').style.display = 'none';
+  track('chat_opened');
 });
 
 document.getElementById('chat-close')?.addEventListener('click', () => {
@@ -322,7 +556,8 @@ function sendMessage() {
   setTimeout(() => {
     const botMsg = document.createElement('div');
     botMsg.className = 'chat-msg bot-msg';
-    botMsg.innerHTML = '<p>Thanks for your message! Our team will respond within 2 minutes. 💬</p>';
+    const waMsg = encodeURIComponent(`Hi BAYWORKS, ${text}`);
+    botMsg.innerHTML = `<p>Thanks — our team will reply here shortly. For an instant response, <a href="https://wa.me/919205005399?text=${waMsg}" target="_blank" rel="noopener" style="color:var(--green); font-weight:600; text-decoration:underline;">message us on WhatsApp</a>.</p>`;
     msgs.appendChild(botMsg);
     msgs.scrollTop = msgs.scrollHeight;
   }, 500);
@@ -330,12 +565,21 @@ function sendMessage() {
 
 /* MOBILE APP NOTIFICATION */
 document.getElementById('app-notify')?.addEventListener('click', () => {
-  const email = document.getElementById('app-email').value;
-  if (!email) {
-    alert('Please enter your email');
+  const input = document.getElementById('app-email');
+  const email = input.value.trim();
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    alert('Please enter a valid email address');
     return;
   }
-  alert('✓ We\'ll notify you at ' + email + ' when the app launches!');
-  document.getElementById('app-email').value = '';
+  captureLead({
+    name: 'App waitlist',
+    email,
+    intent: 'COLD',
+    source: 'website_app_waitlist',
+    utm: { source: 'website', medium: 'app_waitlist' },
+  });
+  track('lead_captured', { source: 'website_app_waitlist' });
+  alert('Done — we\'ll notify you at ' + email + ' when the app launches.');
+  input.value = '';
 });
 

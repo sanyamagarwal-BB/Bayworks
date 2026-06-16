@@ -1448,6 +1448,19 @@
             <button type="button" class="remove-property" data-idx="${idx}" style="padding:0.4rem 0.9rem; background:rgba(239,68,68,0.15); color:#FCA5A5; border:1px solid rgba(239,68,68,0.30); border-radius:6px; cursor:pointer; font-weight:600; font-size:0.8rem;">Remove</button>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.7rem;">
+            <div style="grid-column:1 / -1; display:flex; gap:14px; align-items:center; margin-bottom:0.3rem;">
+              <div style="width:120px; height:74px; flex-shrink:0; border-radius:8px; background:var(--surface-3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                <img class="prop-img-preview" data-img-preview="${idx}" alt="" ${p.image ? `src="${esc(p.image)}"` : ''} style="${p.image ? 'display:block;' : 'display:none;'} width:100%; height:100%; object-fit:cover;" />
+                <span class="prop-img-empty" data-img-empty="${idx}" style="${p.image ? 'display:none;' : ''} font-size:0.7rem; color:var(--text-muted);">No image</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label class="client-upload-btn" style="display:inline-block; text-align:center;">Upload image
+                  <input type="file" accept="image/png,image/jpeg,image/webp" class="prop-img-input" data-idx="${idx}" hidden />
+                </label>
+                <button type="button" class="client-logo-clear prop-img-clear" data-idx="${idx}">Clear image</button>
+              </div>
+              <input type="hidden" data-field="image" value="${esc(p.image)}" />
+            </div>
             <div style="grid-column:1 / -1;"><label style="display:block; font-size:0.75rem; color:rgba(255,255,255,0.55); margin-bottom:0.3rem;">Name</label><input type="text" class="prop-input" data-field="name" value="${esc(p.name)}" style="${inputStyle}" /></div>
             <div><label style="display:block; font-size:0.75rem; color:rgba(255,255,255,0.55); margin-bottom:0.3rem;">City</label><select class="prop-input" data-field="city" style="${inputStyle}">${opts(PROP_CITIES, p.city)}</select></div>
             <div><label style="display:block; font-size:0.75rem; color:rgba(255,255,255,0.55); margin-bottom:0.3rem;">Size (display)</label><input type="text" class="prop-input" data-field="size" value="${esc(p.size)}" placeholder="12,000 sq ft" style="${inputStyle}" /></div>
@@ -1486,13 +1499,51 @@
         el.addEventListener('input', handler);
         el.addEventListener('change', handler);
       });
+
+      // Property image upload / clear
+      const propSaveReload = () => {
+        saveForm();
+        const w = window.opener; if (w) w.location.reload();
+      };
+      container.querySelectorAll('.prop-img-input').forEach(inp => {
+        inp.addEventListener('change', async () => {
+          const file = inp.files && inp.files[0];
+          if (!file) return;
+          const card = inp.closest('.property-edit-card');
+          try {
+            const dataURL = await fileToResizedDataURL(file, 1000, 0.82);
+            card.querySelector('[data-field="image"]').value = dataURL;
+            const preview = card.querySelector('.prop-img-preview');
+            const empty = card.querySelector('.prop-img-empty');
+            preview.src = dataURL; preview.style.display = 'block';
+            if (empty) empty.style.display = 'none';
+            propSaveReload();
+            showStatus('Property image added — saved.', 'success');
+          } catch (e) {
+            showStatus('Could not read that image. Try a JPG, PNG or WebP.', 'error');
+          }
+          inp.value = '';
+        });
+      });
+      container.querySelectorAll('.prop-img-clear').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('.property-edit-card');
+          card.querySelector('[data-field="image"]').value = '';
+          const preview = card.querySelector('.prop-img-preview');
+          const empty = card.querySelector('.prop-img-empty');
+          preview.removeAttribute('src'); preview.style.display = 'none';
+          if (empty) empty.style.display = '';
+          propSaveReload();
+          showStatus('Property image cleared.', 'success');
+        });
+      });
     }
 
     function collectProperties() {
       const cards = document.querySelectorAll('#properties-list-container .property-edit-card');
       return Array.from(cards).map(card => {
         const get = f => card.querySelector(`[data-field="${f}"]`)?.value || '';
-        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status') };
+        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status'), image: get('image') };
       });
     }
 
@@ -1680,7 +1731,7 @@
     document.getElementById('add-property-btn').addEventListener('click', (e) => {
       e.preventDefault();
       const props = getProperties();
-      props.push({ name: 'New Property', city: PROP_CITIES[0], size: '', bucket: PROP_BUCKETS[0], price: '', type: '', status: PROP_STATUSES[0] });
+      props.push({ name: 'New Property', city: PROP_CITIES[0], size: '', bucket: PROP_BUCKETS[0], price: '', type: '', status: PROP_STATUSES[0], image: '' });
       const data = loadCMS();
       data.properties_list = JSON.stringify(props);
       saveCMS(data);
