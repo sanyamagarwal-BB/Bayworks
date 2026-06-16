@@ -6,3 +6,8 @@ dist/
 .DS_Store
 .vercel
 .netlify
+
+# Nested CRM project (has its own deps/tooling) and large/binary assets
+crm/
+.ui-backup/
+public/*.mp4

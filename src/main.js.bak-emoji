@@ -280,9 +280,9 @@ document.querySelectorAll('.quiz-opt').forEach(btn => {
 
 function showQuizResult(pkgType) {
   const recommendations = {
-    'starter': 'Flex Desk Placement – Perfect for small teams up to 50 people',
-    'pro': 'Managed Enterprise Floor – Best for growing teams 50–500 people',
-    'enterprise': 'Campus / HQ Solutions – Ideal for large enterprises 500+ people'
+    'starter': '💼 Flex Desk Placement – Perfect for small teams up to 50 people',
+    'pro': '🏢 Managed Enterprise Floor – Best for growing teams 50–500 people',
+    'enterprise': '🌍 Campus / HQ Solutions – Ideal for large enterprises 500+ people'
   };
 
   document.querySelectorAll('.quiz-question').forEach(q => q.style.display = 'none');

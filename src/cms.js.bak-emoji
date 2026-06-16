@@ -322,8 +322,8 @@ export function applyCMS() {
         return `<div class="property-card" data-city="${p.city || ''}" data-size="${p.bucket || ''}" data-search="${search}">
           <span class="property-status">${p.status || 'Available'}</span>
           <h3>${p.name || ''}</h3>
-          <p><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-map-pin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /> </svg> ${p.city || ''}</p>
-          <p><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-ruler" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" /> <path d="m14.5 12.5 2-2" /> <path d="m11.5 9.5 2-2" /> <path d="m8.5 6.5 2-2" /> <path d="m17.5 15.5 2-2" /> </svg> ${p.size || ''} · ${p.type || ''}</p>
+          <p>📍 ${p.city || ''}</p>
+          <p>📐 ${p.size || ''} · ${p.type || ''}</p>
           <div class="property-price">${p.price || ''}</div>
         </div>`;
       }).join('');

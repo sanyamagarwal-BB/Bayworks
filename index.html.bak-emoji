@@ -622,7 +622,7 @@
         <div class="team-grid">
 
           <div class="team-card reveal">
-            <div class="team-photo-placeholder"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-user" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /> </svg></div>
+            <div class="team-photo-placeholder">👤</div>
             <h3 class="team-name" data-cms="team_1_name">Vikram Sharma</h3>
             <p class="team-title" data-cms="team_1_title">Co-Founder & CEO</p>
             <p class="team-bio" data-cms="team_1_bio">15+ years in institutional real estate. Built portfolios for 50+ Fortune 500 companies across India.</p>
@@ -630,7 +630,7 @@
           </div>
 
           <div class="team-card reveal">
-            <div class="team-photo-placeholder"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-user" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /> </svg></div>
+            <div class="team-photo-placeholder">👤</div>
             <h3 class="team-name" data-cms="team_2_name">Priya Desai</h3>
             <p class="team-title" data-cms="team_2_title">Co-Founder & COO</p>
             <p class="team-bio" data-cms="team_2_bio">Legal expert, real estate law specialist. Clears complex title deeds and regulatory hurdles.</p>
@@ -638,7 +638,7 @@
           </div>
 
           <div class="team-card reveal">
-            <div class="team-photo-placeholder"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-user" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /> </svg></div>
+            <div class="team-photo-placeholder">👤</div>
             <h3 class="team-name" data-cms="team_3_name">Rajesh Kumar</h3>
             <p class="team-title" data-cms="team_3_title">VP, Vendor Relations</p>
             <p class="team-bio" data-cms="team_3_bio">Direct relationships with 200+ property owners. Unlocks off-market inventory daily.</p>
@@ -796,7 +796,7 @@
           </div>
         </div>
         <div class="savings-result">
-          <h3><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-piggy-bank" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z" /> <path d="M16 10h.01" /> <path d="M2 8v1a2 2 0 0 0 2 2h1" /> </svg> You Save</h3>
+          <h3>💰 You Save</h3>
           <div id="savings-amount" style="font-size: 2.5rem; font-weight: 700; color: var(--green); margin: 1rem 0;">₹0</div>
           <p id="savings-pct" style="font-size: 1.1rem; color: var(--ink-muted);">/year (0% reduction)</p>
         </div>
@@ -883,18 +883,18 @@
       </div>
       <div id="chat-widget" class="chat-widget">
         <div class="chat-header">
-          <h3><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-message-circle" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> </svg> Chat with BAYWORKS</h3>
+          <h3>💬 Chat with BAYWORKS</h3>
           <button id="chat-close" class="chat-close">✕</button>
         </div>
         <div class="chat-messages" id="chat-messages">
-          <div class="chat-msg bot-msg"><p>Hi! How can we help you today?</p></div>
+          <div class="chat-msg bot-msg"><p>Hi! 👋 How can we help you today?</p></div>
         </div>
         <div class="chat-input">
           <input type="text" id="chat-input" placeholder="Ask anything..." />
           <button id="chat-send">Send</button>
         </div>
       </div>
-      <button id="chat-open" class="chat-open-btn"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-message-circle" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> </svg> Chat Now</button>
+      <button id="chat-open" class="chat-open-btn">💬 Chat Now</button>
     </section>
 
     <!-- 7. GOOGLE MAPS INTEGRATION -->
@@ -906,7 +906,7 @@
           <p class="section-sub">Distance to your office, airport, key locations. Click property pins for details.</p>
         </div>
         <div class="map-container" style="width: 100%; height: 450px; background: var(--gray-200); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--ink-muted); font-size: 1.1rem; overflow: hidden;">
-          <svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-map" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /> <path d="M15 5.764v15" /> <path d="M9 3.236v15" /> </svg> Google Maps - Properties Pinned by Location
+          🗺️ Google Maps - Properties Pinned by Location
         </div>
       </div>
     </section>
@@ -937,8 +937,8 @@
             <input type="email" id="app-email" placeholder="your@company.com" style="width: 100%; padding: 0.85rem; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 1rem;" />
             <button id="app-notify" class="btn-primary btn-full">Notify Me at Launch</button>
             <div style="margin-top: 1.5rem; text-align: center; display: flex; gap: 1rem; justify-content: center;">
-              <a href="#" style="color: var(--green); text-decoration: none; font-weight: 600;"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-smartphone" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="14" height="20" x="5" y="2" rx="2" ry="2" /> <path d="M12 18h.01" /> </svg> Download on iOS</a>
-              <a href="#" style="color: var(--green); text-decoration: none; font-weight: 600;"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-smartphone" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="14" height="20" x="5" y="2" rx="2" ry="2" /> <path d="M12 18h.01" /> </svg> Download on Android</a>
+              <a href="#" style="color: var(--green); text-decoration: none; font-weight: 600;">📲 Download on iOS</a>
+              <a href="#" style="color: var(--green); text-decoration: none; font-weight: 600;">📲 Download on Android</a>
             </div>
           </div>
         </div>
@@ -955,7 +955,7 @@
     <section id="virt-tours" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-box" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /> <path d="m3.3 7 8.7 5 8.7-5" /> <path d="M12 22V12" /> </svg></div>
+          <div class="feature-icon">🥽</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="virt_tours_title">360° Virtual Tours</h3>
             <p class="feature-desc" data-cms="virt_tours_desc">Walk through properties in immersive 3D before scheduling a site visit. Saves your team 10+ hours of commute time.</p>
@@ -969,7 +969,7 @@
     <section id="floor-plans" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-ruler" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" /> <path d="m14.5 12.5 2-2" /> <path d="m11.5 9.5 2-2" /> <path d="m8.5 6.5 2-2" /> <path d="m17.5 15.5 2-2" /> </svg></div>
+          <div class="feature-icon">📐</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="floor_plans_title">Interactive Floor Plans</h3>
             <p class="feature-desc" data-cms="floor_plans_desc">Detailed CAD layouts with zone mapping, desk counts, and breakout areas. Export for your space planning team.</p>
@@ -983,7 +983,7 @@
     <section id="esign" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-pen-line" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M13 21h8" /> <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> </svg></div>
+          <div class="feature-icon">✍️</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="esign_title">Digital Lease Signing</h3>
             <p class="feature-desc" data-cms="esign_desc">Sign leases electronically with legally-compliant e-signatures. Cut paperwork cycle from 14 days to 2 hours.</p>
@@ -997,7 +997,7 @@
     <section id="doc-library" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-book-open" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12 7v14" /> <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /> </svg></div>
+          <div class="feature-icon">📚</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="doc_lib_title">Compliance Document Hub</h3>
             <p class="feature-desc" data-cms="doc_lib_desc">Access templates, regulatory docs, compliance checklists, and property certifications in one secure vault.</p>
@@ -1011,7 +1011,7 @@
     <section id="prop-alerts" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-bell" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10.268 21a2 2 0 0 0 3.464 0" /> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /> </svg></div>
+          <div class="feature-icon">🔔</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="alerts_title">Real-Time Property Alerts</h3>
             <p class="feature-desc" data-cms="alerts_desc">Get notified instantly when new properties match your criteria. Never miss an opportunity in your market.</p>
@@ -1025,7 +1025,7 @@
     <section id="video-consult" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-video" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /> <rect x="2" y="6" width="14" height="12" rx="2" /> </svg></div>
+          <div class="feature-icon">🎥</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="video_consult_title">Live Video Walkthroughs</h3>
             <p class="feature-desc" data-cms="video_consult_desc">Real-time video calls with property managers. See spaces, ask questions, get instant answers — no travel needed.</p>
@@ -1039,7 +1039,7 @@
     <section id="market-analytics" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-chart-column" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /> </svg></div>
+          <div class="feature-icon">📊</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="market_analytics_title">Market Analytics & Trends</h3>
             <p class="feature-desc" data-cms="market_analytics_desc">Real-time pricing data, occupancy trends, and lease agreement terms across your cities. Make data-driven decisions.</p>
@@ -1055,7 +1055,7 @@
     <section id="financing" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-credit-card" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="20" height="14" x="2" y="5" rx="2" /> <line x1="2" x2="22" y1="10" y2="10" /> </svg></div>
+          <div class="feature-icon">💳</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="financing_title">Flexible Financing Options</h3>
             <p class="feature-desc" data-cms="financing_desc">Lease structuring, payment plans, and deposit alternatives. Work with your cash flow, not against it.</p>
@@ -1069,7 +1069,7 @@
     <section id="referral" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-handshake" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m11 17 2 2a1 1 0 1 0 3-3" /> <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" /> <path d="m21 3 1 11h-2" /> <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" /> <path d="M3 4h8" /> </svg></div>
+          <div class="feature-icon">🤝</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="referral_title">Partner Referral Program</h3>
             <p class="feature-desc" data-cms="referral_desc">Refer a corporate client and earn recurring commissions. Passive income for your network.</p>
@@ -1083,7 +1083,7 @@
     <section id="whitepapers" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-newspaper" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M15 18h-5" /> <path d="M18 14h-8" /> <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" /> <rect width="8" height="4" x="10" y="6" rx="1" /> </svg></div>
+          <div class="feature-icon">📖</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="wp_title">Industry Whitepapers</h3>
             <p class="feature-desc" data-cms="wp_desc">Exclusive research on corporate real estate trends, cost optimization, and market outlook for 2025-2026.</p>
@@ -1097,7 +1097,7 @@
     <section id="adv-filter" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-search" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="m21 21-4.34-4.34" /> <circle cx="11" cy="11" r="8" /> </svg></div>
+          <div class="feature-icon">🔎</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="filter_title">AI-Powered Search Filters</h3>
             <p class="feature-desc" data-cms="filter_desc">Filter by budget, location, amenities, parking, connectivity, and sustainability rating. Find your perfect fit in seconds.</p>
@@ -1111,7 +1111,7 @@
     <section id="portfolio" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-layers" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" /> <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" /> <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /> </svg></div>
+          <div class="feature-icon">🗂️</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="portfolio_title">Lease Portfolio Dashboard</h3>
             <p class="feature-desc" data-cms="portfolio_desc">Track all active leases, renewal dates, and expiring contracts across your corporate footprint in one dashboard.</p>
@@ -1125,7 +1125,7 @@
     <section id="compliance" class="section-gray">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-badge-check" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /> <path d="m9 12 2 2 4-4" /> </svg></div>
+          <div class="feature-icon">✅</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="compliance_title">Automated Compliance Tracking</h3>
             <p class="feature-desc" data-cms="compliance_desc">Automatic reminders for regulatory filings, property certifications, and lease renewal timelines.</p>
@@ -1139,7 +1139,7 @@
     <section id="sustain" class="section-light">
       <div class="container">
         <div class="feature-card-row">
-          <div class="feature-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-leaf" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /> <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /> </svg></div>
+          <div class="feature-icon">🌱</div>
           <div class="feature-content">
             <h3 class="feature-title" data-cms="sustain_title">ESG & Sustainability Ratings</h3>
             <p class="feature-desc" data-cms="sustain_desc">See green certifications, carbon footprint, and ESG compliance for every property. Align your real estate with corporate values.</p>
@@ -1163,42 +1163,42 @@
 
         <div class="roadmap-grid">
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-bot" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /> </svg></div>
+            <div class="roadmap-icon">🤖</div>
             <h4 data-cms="tier3_f1_title">AI Property Matching</h4>
             <p data-cms="tier3_f1_desc">ML-powered recommendations based on your company DNA</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-sparkles" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /> </svg></div>
+            <div class="roadmap-icon">🔮</div>
             <h4 data-cms="tier3_f2_title">Predictive Analytics</h4>
             <p data-cms="tier3_f2_desc">Forecast market trends 6 months ahead</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-trending-up" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /> </svg></div>
+            <div class="roadmap-icon">📈</div>
             <h4 data-cms="tier3_f3_title">Advanced Reporting</h4>
             <p data-cms="tier3_f3_desc">Custom dashboards and BI integration</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-link" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /> <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /> </svg></div>
+            <div class="roadmap-icon">🔗</div>
             <h4 data-cms="tier3_f4_title">API Integration</h4>
             <p data-cms="tier3_f4_desc">Sync with your ERP, HCM, and finance systems</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-globe" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <circle cx="12" cy="12" r="10" /> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /> <path d="M2 12h20" /> </svg></div>
+            <div class="roadmap-icon">🌍</div>
             <h4 data-cms="tier3_f5_title">Global Expansion</h4>
             <p data-cms="tier3_f5_desc">Coverage expanding to Singapore, HK, London</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-users" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /> </svg></div>
+            <div class="roadmap-icon">👥</div>
             <h4 data-cms="tier3_f6_title">Tenant Communities</h4>
             <p data-cms="tier3_f6_desc">Network with 500+ corporate tenants</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-tag" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" /> <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" /> </svg></div>
+            <div class="roadmap-icon">🏷️</div>
             <h4 data-cms="tier3_f7_title">White Label Solutions</h4>
             <p data-cms="tier3_f7_desc">Reseller program for brokers & advisors</p>
           </div>
           <div class="roadmap-card reveal">
-            <div class="roadmap-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-settings" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" /> <circle cx="12" cy="12" r="3" /> </svg></div>
+            <div class="roadmap-icon">⚙️</div>
             <h4 data-cms="tier3_f8_title">Enterprise Customization</h4>
             <p data-cms="tier3_f8_desc">Custom workflows for your org</p>
           </div>
@@ -1222,14 +1222,14 @@
             <p class="about-body" data-cms="about_p2">Whether your immediate mandate is a Grade-A managed enterprise floor, a highly flexible coworking setup, or an outright commercial acquisition — we've re-engineered the corporate leasing process to solve your core operational bottlenecks.</p>
             <div class="about-offices">
               <div class="office-card">
-                <div class="office-flag"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-building-2" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 12h4" /> <path d="M10 8h4" /> <path d="M14 21v-3a2 2 0 0 0-4 0v3" /> <path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2" /> <path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" /> </svg></div>
+                <div class="office-flag">🇮🇳</div>
                 <div>
                   <strong>Gurugram HQ</strong>
                   <p>Regus Level 5 &amp; 6, JMD Regent Square,<br/>DLF Phase 2, Gurugram 122002</p>
                 </div>
               </div>
               <div class="office-card">
-                <div class="office-flag"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-building-2" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M10 12h4" /> <path d="M10 8h4" /> <path d="M14 21v-3a2 2 0 0 0-4 0v3" /> <path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2" /> <path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" /> </svg></div>
+                <div class="office-flag">🇦🇪</div>
                 <div>
                   <strong>Dubai Office</strong>
                   <p>Boulevard Plaza, Tower 1, Level 9,<br/>Sheikh Mohammad Bin Rashid Blvd, Dubai</p>
@@ -1239,7 +1239,7 @@
           </div>
           <div class="about-right reveal">
             <div class="photo-placeholder about-photo">
-              <span class="ph-icon"><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-image" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> </svg></span>
+              <span class="ph-icon">📸</span>
               <span>Team / Office Photo</span>
               <span class="ph-hint">Recommended: 800×900px</span>
             </div>
