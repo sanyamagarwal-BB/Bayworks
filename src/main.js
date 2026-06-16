@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initProperties();
   initHeroBackground();
   initPropertyModal();
+  initFeatured();
   initComingSoon();
   flushLeadQueue();   // retry any leads queued while the CRM was unreachable
   track('page_view', { title: document.title });
@@ -273,6 +274,26 @@ function openPropertyModal(idx) {
   dialog.querySelector('[data-modal-book]')?.addEventListener('click', () => { dialog.close(); bookTour(idx); });
   dialog.showModal();
   track('property_view', { name: p.name, city: p.city });
+}
+
+/* ── FEATURED PROJECTS: scroll into the listing, then open detail ── */
+function initFeatured() {
+  const grid = document.getElementById('featured-grid');
+  if (!grid) return;
+  const open = (card) => {
+    const idx = +card.dataset.idx;
+    document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => openPropertyModal(idx), 480);   // let the scroll settle first
+    track('featured_click', { idx, name: (window.__BAYWORKS_PROPS || [])[idx]?.name });
+  };
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.featured-card');
+    if (card) open(card);
+  });
+  grid.addEventListener('keydown', (e) => {
+    const card = e.target.closest('.featured-card');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(card); }
+  });
 }
 
 function bookTour(idx) {

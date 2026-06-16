@@ -1443,9 +1443,14 @@
       const container = document.getElementById('properties-list-container');
       container.innerHTML = props.map((p, idx) => `
         <div class="property-edit-card" data-prop-idx="${idx}" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:1.2rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.9rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.9rem; gap:0.8rem;">
             <strong style="color:#FFFFFF; font-size:0.95rem;">Property ${idx + 1}</strong>
-            <button type="button" class="remove-property" data-idx="${idx}" style="padding:0.4rem 0.9rem; background:rgba(239,68,68,0.15); color:#FCA5A5; border:1px solid rgba(239,68,68,0.30); border-radius:6px; cursor:pointer; font-weight:600; font-size:0.8rem;">Remove</button>
+            <div style="display:flex; align-items:center; gap:0.9rem;">
+              <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:rgba(255,255,255,0.70); cursor:pointer; user-select:none;">
+                <input type="checkbox" class="prop-input prop-featured" data-field="featured" ${p.featured ? 'checked' : ''} style="accent-color:#34D399; width:16px; height:16px; cursor:pointer;" /> Featured
+              </label>
+              <button type="button" class="remove-property" data-idx="${idx}" style="padding:0.4rem 0.9rem; background:rgba(239,68,68,0.15); color:#FCA5A5; border:1px solid rgba(239,68,68,0.30); border-radius:6px; cursor:pointer; font-weight:600; font-size:0.8rem;">Remove</button>
+            </div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.7rem;">
             <div style="grid-column:1 / -1; display:flex; gap:14px; align-items:center; margin-bottom:0.3rem;">
@@ -1543,7 +1548,8 @@
       const cards = document.querySelectorAll('#properties-list-container .property-edit-card');
       return Array.from(cards).map(card => {
         const get = f => card.querySelector(`[data-field="${f}"]`)?.value || '';
-        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status'), image: get('image') };
+        const featured = card.querySelector('[data-field="featured"]')?.checked || false;
+        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status'), image: get('image'), featured };
       });
     }
 
@@ -1731,7 +1737,7 @@
     document.getElementById('add-property-btn').addEventListener('click', (e) => {
       e.preventDefault();
       const props = getProperties();
-      props.push({ name: 'New Property', city: PROP_CITIES[0], size: '', bucket: PROP_BUCKETS[0], price: '', type: '', status: PROP_STATUSES[0], image: '' });
+      props.push({ name: 'New Property', city: PROP_CITIES[0], size: '', bucket: PROP_BUCKETS[0], price: '', type: '', status: PROP_STATUSES[0], image: '', featured: false });
       const data = loadCMS();
       data.properties_list = JSON.stringify(props);
       saveCMS(data);

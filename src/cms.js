@@ -85,12 +85,12 @@ export const DEFAULTS = {
 
   // Available Properties (editable mock listings) — managed from admin
   properties_list: JSON.stringify([
-    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available' },
+    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available', featured: true },
     { name: 'BKC Premier',         city: 'Mumbai',    size: '8,500 sq ft',  bucket: '5k-20k sqft',  price: '₹140/sq ft/mo', type: 'Grade-A',       status: 'Available' },
     { name: 'Outer Ring Hub',      city: 'Bengaluru', size: '25,000 sq ft', bucket: '20k-50k sqft', price: '₹78/sq ft/mo',  type: 'Managed Floor', status: 'Available' },
     { name: 'HITEC Signature',     city: 'Hyderabad', size: '4,200 sq ft',  bucket: '0-5k sqft',    price: '₹65/sq ft/mo',  type: 'Coworking',     status: 'Available' },
-    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal'  },
-    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available' },
+    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal',  featured: true },
+    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available', featured: true },
   ]),
 
   // FAQ
@@ -376,6 +376,36 @@ export function applyCMS() {
     bookingSelect.innerHTML = props.map(p =>
       `<option data-city="${esc(p.city)}">${esc(p.name)} — ${esc(p.city)} (${esc(p.size)})</option>`
     ).join('');
+  }
+
+  // Featured Projects — curated cards that link into the listing
+  const featuredGrid = document.getElementById('featured-grid');
+  const featuredSection = document.getElementById('featured');
+  if (featuredGrid) {
+    const featured = props.map((p, i) => ({ p, i })).filter(x => x.p.featured);
+    if (featured.length) {
+      featuredGrid.innerHTML = featured.map(({ p, i }) => {
+        const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];
+        const img = p.image
+          ? `<div class="featured-img"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" /></div>`
+          : `<div class="featured-img featured-img--empty">${PIN_SVG}<span>${esc(p.city || 'Project')}</span></div>`;
+        return `<article class="featured-card" data-idx="${i}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
+          ${img}
+          <div class="featured-body">
+            <span class="property-status status--${statusSlug}">${p.status || 'Available'}</span>
+            <h3>${p.name || ''}</h3>
+            <p>${PIN_SVG} ${p.city || ''}${p.type ? ` · ${p.type}` : ''}</p>
+            <div class="featured-foot">
+              <span class="property-price">${p.price || ''}</span>
+              <span class="featured-link">View details &rarr;</span>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+      if (featuredSection) featuredSection.style.display = '';
+    } else if (featuredSection) {
+      featuredSection.style.display = 'none';
+    }
   }
 
   // #8 — Quote city dropdown + pricing from the single QUOTE_PRICES source
