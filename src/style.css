@@ -1345,6 +1345,37 @@ img { display: block; max-width: 100%; }
 .featured-foot .property-price { margin: 0; }
 .featured-link { font-family: var(--font-head); font-weight: 600; color: var(--green); font-size: 0.85rem; }
 
+/* ── ROADMAP (collapsed coming-soon features) ───────────────── */
+.roadmap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 2.5rem; }
+@media (max-width: 900px) { .roadmap-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .roadmap-grid { grid-template-columns: 1fr; } }
+.roadmap-card {
+  position: relative; background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 1.4rem 1.5rem;
+  transition: border-color var(--fast), box-shadow var(--fast);
+}
+.roadmap-card:hover { border-color: var(--green-border); box-shadow: 0 6px 18px rgba(5,150,105,0.08); }
+.roadmap-card .coming-soon-badge { display: inline-block; margin: 0 0 0.7rem; }
+.roadmap-title { font-size: 1rem; margin: 0 0 0.4rem; color: var(--ink); }
+.roadmap-desc { font-size: 0.85rem; color: var(--ink-muted); line-height: 1.55; margin: 0; }
+.roadmap-more { margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.2rem; }
+.roadmap-more summary {
+  cursor: pointer; font-family: var(--font-head); font-weight: 600;
+  color: var(--ink); font-size: 0.95rem;
+  list-style: none; display: flex; align-items: center; gap: 0.5rem;
+}
+.roadmap-more summary::-webkit-details-marker { display: none; }
+.roadmap-more summary::before { content: "+"; color: var(--green); font-weight: 700; font-size: 1.1rem; }
+.roadmap-more[open] summary::before { content: "\2212"; }
+.roadmap-list {
+  list-style: none; display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem 2rem; margin: 1.2rem 0 0; padding: 0;
+}
+@media (max-width: 560px) { .roadmap-list { grid-template-columns: 1fr; } }
+.roadmap-list li { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.85rem; }
+.roadmap-list strong { color: var(--ink); }
+.roadmap-list span { color: var(--ink-muted); }
+
 /* Results toolbar: count · saved filter */
 .properties-toolbar {
   display: flex; align-items: center; justify-content: space-between;
