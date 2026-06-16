@@ -85,12 +85,12 @@ export const DEFAULTS = {
 
   // Available Properties (editable mock listings) — managed from admin
   properties_list: JSON.stringify([
-    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available', featured: true },
-    { name: 'BKC Premier',         city: 'Mumbai',    size: '8,500 sq ft',  bucket: '5k-20k sqft',  price: '₹140/sq ft/mo', type: 'Grade-A',       status: 'Available' },
-    { name: 'Outer Ring Hub',      city: 'Bengaluru', size: '25,000 sq ft', bucket: '20k-50k sqft', price: '₹78/sq ft/mo',  type: 'Managed Floor', status: 'Available' },
-    { name: 'HITEC Signature',     city: 'Hyderabad', size: '4,200 sq ft',  bucket: '0-5k sqft',    price: '₹65/sq ft/mo',  type: 'Coworking',     status: 'Available' },
-    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal',  featured: true },
-    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available', featured: true },
+    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/cyber-city-tower-a.jpg', featured: true },
+    { name: 'BKC Premier',         city: 'Mumbai',    size: '8,500 sq ft',  bucket: '5k-20k sqft',  price: '₹140/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/bkc-premier.jpg',        featured: true },
+    { name: 'Outer Ring Hub',      city: 'Bengaluru', size: '25,000 sq ft', bucket: '20k-50k sqft', price: '₹78/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/outer-ring-hub.jpg',     featured: true },
+    { name: 'HITEC Signature',     city: 'Hyderabad', size: '4,200 sq ft',  bucket: '0-5k sqft',    price: '₹65/sq ft/mo',  type: 'Coworking',     status: 'Available', image: '/properties/hitec-signature.jpg' },
+    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal',  image: '/properties/golf-course-ext.jpg',   featured: true },
+    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/powai-tech-park.jpg' },
   ]),
 
   // FAQ
@@ -284,7 +284,35 @@ export function saveCMS(data) {
   localStorage.setItem(CMS_KEY, JSON.stringify(data));
 }
 
+// One-time, non-destructive migration: backfill default property images +
+// featured flags (by name) onto data saved before those fields existed.
+const SEED_VERSION = 1;
+function seedDefaults() {
+  let stored;
+  try { stored = JSON.parse(localStorage.getItem(CMS_KEY) || '{}'); } catch { stored = {}; }
+  if (stored._seed >= SEED_VERSION) return;
+
+  const defByName = Object.fromEntries(JSON.parse(DEFAULTS.properties_list).map(p => [p.name, p]));
+  let props;
+  try { props = JSON.parse(stored.properties_list || DEFAULTS.properties_list); }
+  catch { props = JSON.parse(DEFAULTS.properties_list); }
+
+  props = props.map(p => {
+    const d = defByName[p.name];
+    if (d) {
+      if (!p.image && d.image) p.image = d.image;                 // add image if missing
+      if (p.featured === undefined && d.featured) p.featured = true; // honor default feature
+    }
+    return p;
+  });
+
+  stored.properties_list = JSON.stringify(props);
+  stored._seed = SEED_VERSION;
+  try { localStorage.setItem(CMS_KEY, JSON.stringify(stored)); } catch {}
+}
+
 export function applyCMS() {
+  seedDefaults();
   const d = loadCMS();
   document.querySelectorAll('[data-cms]').forEach(el => {
     const key = el.dataset.cms;
