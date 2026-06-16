@@ -1344,6 +1344,8 @@ img { display: block; max-width: 100%; }
 .featured-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
 .featured-foot .property-price { margin: 0; }
 .featured-link { font-family: var(--font-head); font-weight: 600; color: var(--green); font-size: 0.85rem; }
+.featured-cta { text-align: center; margin-top: 2.5rem; }
+.featured-cta .btn-primary { display: inline-block; }
 
 /* ── ROADMAP (collapsed coming-soon features) ───────────────── */
 .roadmap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 2.5rem; }

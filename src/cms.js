@@ -382,7 +382,9 @@ export function applyCMS() {
   const featuredGrid = document.getElementById('featured-grid');
   const featuredSection = document.getElementById('featured');
   if (featuredGrid) {
-    const featured = props.map((p, i) => ({ p, i })).filter(x => x.p.featured);
+    const limit = parseInt(featuredGrid.dataset.limit || '0', 10);
+    let featured = props.map((p, i) => ({ p, i })).filter(x => x.p.featured);
+    if (limit > 0) featured = featured.slice(0, limit);
     if (featured.length) {
       featuredGrid.innerHTML = featured.map(({ p, i }) => {
         const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];

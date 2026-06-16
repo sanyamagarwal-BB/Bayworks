@@ -41,9 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initPropertyModal();
   initFeatured();
   initComingSoon();
+  maybeOpenDeepLinkedProperty();   // ?property=<idx> from the Home featured teaser
   flushLeadQueue();   // retry any leads queued while the CRM was unreachable
   track('page_view', { title: document.title });
 });
+
+/* Open a specific property if arrived via /properties.html?property=<idx> */
+function maybeOpenDeepLinkedProperty() {
+  const modal = document.getElementById('property-modal');
+  if (!modal) return;
+  const pid = new URLSearchParams(location.search).get('property');
+  if (pid === null) return;
+  const idx = parseInt(pid, 10);
+  if (Number.isNaN(idx)) return;
+  setTimeout(() => {
+    document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    openPropertyModal(idx);
+  }, 350);
+}
 
 /* ── SPRINT-2 FEATURES: honest "Coming soon" treatment ─────────── */
 function initComingSoon() {
@@ -282,9 +297,17 @@ function initFeatured() {
   if (!grid) return;
   const open = (card) => {
     const idx = +card.dataset.idx;
-    document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => openPropertyModal(idx), 480);   // let the scroll settle first
     track('featured_click', { idx, name: (window.__BAYWORKS_PROPS || [])[idx]?.name });
+    const listing = document.getElementById('properties');
+    const modal = document.getElementById('property-modal');
+    if (listing && modal) {
+      // On the Properties page: scroll to the listing and open the detail in place
+      listing.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => openPropertyModal(idx), 480);
+    } else {
+      // On the Home teaser: deep-link into the Properties page, opening this property
+      window.location.href = `/properties.html?property=${idx}`;
+    }
   };
   grid.addEventListener('click', (e) => {
     const card = e.target.closest('.featured-card');
