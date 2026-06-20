@@ -16,7 +16,9 @@ export async function loadInventory() {
     if (!res.ok) return null;
     const data = await res.json();
     const items = data && Array.isArray(data.items) ? data.items : null;
-    return items && items.length ? items : null;
+    if (!items || !items.length) return null;
+    // Carry the CRM unit id through as `unitId` so cards can save to the shortlist.
+    return items.map((it) => ({ ...it, unitId: it.id }));
   } catch {
     return null; // CRM unreachable → caller keeps existing listings
   }

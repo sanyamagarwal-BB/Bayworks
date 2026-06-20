@@ -57,3 +57,16 @@ export const summary     = ()  => req('/portal/summary',     { auth: true });
 export const requirement = ()  => req('/portal/requirement', { auth: true });
 export const shortlist   = ()  => req('/portal/shortlist',   { auth: true });
 export const visits      = ()  => req('/portal/visits',      { auth: true });
+
+export const addShortlist    = (unitId) => req('/portal/shortlist', { method: 'POST', body: { unitId }, auth: true });
+export const removeShortlist = (unitId) => req(`/portal/shortlist/${encodeURIComponent(unitId)}`, { method: 'DELETE', auth: true });
+
+/** Set of unitIds already shortlisted by the current customer ({} on failure). */
+export async function savedUnitIds() {
+  try {
+    const { items } = await shortlist();
+    return new Set((items || []).map((i) => i.unitId).filter(Boolean));
+  } catch {
+    return new Set();
+  }
+}

@@ -2,6 +2,8 @@
 import { applyCMSFromAPI } from './cms-api.js';
 import { applyCMS, CMS_KEY } from './cms.js';
 import { loadInventory } from './inventory-api.js';
+import { isApiSession } from './auth.js';
+import { addShortlist, removeShortlist, savedUnitIds } from './portal-api.js';
 import { initCity } from './city.js';
 import { captureLead, flushLeadQueue } from './crm.js';
 import { track } from './analytics.js';
@@ -68,6 +70,25 @@ async function hydrateLiveInventory() {
     if (prev === null) localStorage.removeItem(CMS_KEY); // DOM already rendered; restore store
     else localStorage.setItem(CMS_KEY, prev);
   }
+  await markServerShortlist();
+}
+
+/* For a logged-in customer, reflect their saved CRM shortlist on the live cards
+ * (heart filled) and mirror into local favorites so the "Saved" filter agrees. */
+async function markServerShortlist() {
+  const grid = document.getElementById('properties-grid');
+  if (!grid || !isApiSession()) return;
+  const saved = await savedUnitIds();
+  if (!saved.size) return;
+  const favs = getFavs();
+  grid.querySelectorAll('.property-card[data-unit-id]').forEach((card) => {
+    if (!saved.has(card.dataset.unitId)) return;
+    card.classList.add('is-fav');
+    card.querySelector('.fav-btn')?.setAttribute('aria-pressed', 'true');
+    if (card.dataset.name && !favs.includes(card.dataset.name)) favs.push(card.dataset.name);
+  });
+  setFavs(favs);
+  if (typeof window.filterProperties === 'function') window.filterProperties();
 }
 
 /* Open a specific property if arrived via /properties.html?property=<idx> */
@@ -245,7 +266,13 @@ function initProperties() {
     const name = favTrigger.dataset.fav;
     const saved = toggleFav(name);
     favTrigger.setAttribute('aria-pressed', String(saved));
-    favTrigger.closest('.property-card')?.classList.toggle('is-fav', saved);
+    const card = favTrigger.closest('.property-card');
+    card?.classList.toggle('is-fav', saved);
+    // Logged-in customers: persist to their CRM shortlist (live units only).
+    const unitId = card?.dataset.unitId;
+    if (unitId && isApiSession()) {
+      (saved ? addShortlist(unitId) : removeShortlist(unitId)).catch(() => { /* offline — local fav still set */ });
+    }
     if (favOnly) reapply();
     track('property_favorite', { name, saved });
   });

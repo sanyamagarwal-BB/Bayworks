@@ -382,7 +382,7 @@ export function applyCMS() {
         ? `<div class="property-img"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" /></div>`
         : `<div class="property-img property-img--empty">${PIN_SVG}<span>${esc(p.city || 'Property')}</span></div>`;
       const waMsg = encodeURIComponent(`Hi BAYWORKS, I'm interested in "${p.name || 'a property'}" (${p.city || ''}). Please share details.`);
-      return `<article class="property-card${isFav ? ' is-fav' : ''}" data-idx="${i}" data-name="${esc(p.name)}" data-city="${esc(p.city)}" data-size="${esc(p.bucket)}" data-price="${priceNum}" data-sqft="${sqftNum}" data-search="${esc(search)}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
+      return `<article class="property-card${isFav ? ' is-fav' : ''}" data-idx="${i}" data-name="${esc(p.name)}" data-city="${esc(p.city)}" data-size="${esc(p.bucket)}" data-price="${priceNum}" data-sqft="${sqftNum}"${p.unitId ? ` data-unit-id="${esc(p.unitId)}"` : ''} data-search="${esc(search)}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
         <button type="button" class="fav-btn" data-fav="${esc(p.name)}" aria-label="Save ${esc(p.name)}" aria-pressed="${isFav}">${HEART_SVG}</button>
         ${img}
         <div class="property-body">
