@@ -85,12 +85,12 @@ export const DEFAULTS = {
 
   // Available Properties (editable mock listings) — managed from admin
   properties_list: JSON.stringify([
-    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/cyber-city-tower-a.jpg', featured: true },
-    { name: 'BKC Premier',         city: 'Mumbai',    size: '8,500 sq ft',  bucket: '5k-20k sqft',  price: '₹140/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/bkc-premier.jpg',        featured: true },
-    { name: 'Outer Ring Hub',      city: 'Bengaluru', size: '25,000 sq ft', bucket: '20k-50k sqft', price: '₹78/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/outer-ring-hub.jpg',     featured: true },
-    { name: 'HITEC Signature',     city: 'Hyderabad', size: '4,200 sq ft',  bucket: '0-5k sqft',    price: '₹65/sq ft/mo',  type: 'Coworking',     status: 'Available', image: '/properties/hitec-signature.jpg' },
-    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal',  image: '/properties/golf-course-ext.jpg',   featured: true },
-    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/powai-tech-park.jpg' },
+    { name: 'Cyber City Tower A',  city: 'Gurugram',  size: '12,000 sq ft', bucket: '5k-20k sqft',  price: '₹95/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/cyber-city-tower-a.jpg', images: ['/properties/cyber-city-tower-a.jpg','/properties/bkc-premier.jpg','/properties/golf-course-ext.jpg'], featured: true },
+    { name: 'BKC Premier',         city: 'Mumbai',    size: '8,500 sq ft',  bucket: '5k-20k sqft',  price: '₹140/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/bkc-premier.jpg',        images: ['/properties/bkc-premier.jpg','/properties/powai-tech-park.jpg','/properties/outer-ring-hub.jpg'], featured: true },
+    { name: 'Outer Ring Hub',      city: 'Bengaluru', size: '25,000 sq ft', bucket: '20k-50k sqft', price: '₹78/sq ft/mo',  type: 'Managed Floor', status: 'Available', image: '/properties/outer-ring-hub.jpg',     images: ['/properties/outer-ring-hub.jpg','/properties/hitec-signature.jpg','/properties/bkc-premier.jpg'], featured: true },
+    { name: 'HITEC Signature',     city: 'Hyderabad', size: '4,200 sq ft',  bucket: '0-5k sqft',    price: '₹65/sq ft/mo',  type: 'Coworking',     status: 'Available', image: '/properties/hitec-signature.jpg',    images: ['/properties/hitec-signature.jpg','/properties/outer-ring-hub.jpg','/properties/powai-tech-park.jpg'], featured: true },
+    { name: 'Golf Course Ext.',    city: 'Gurugram',  size: '55,000 sq ft', bucket: '50k+ sqft',    price: '₹88/sq ft/mo',  type: 'Campus / HQ',   status: 'Hot Deal',  image: '/properties/golf-course-ext.jpg',   images: ['/properties/golf-course-ext.jpg','/properties/cyber-city-tower-a.jpg','/properties/bkc-premier.jpg'], featured: true },
+    { name: 'Powai Tech Park',     city: 'Mumbai',    size: '18,000 sq ft', bucket: '5k-20k sqft',  price: '₹110/sq ft/mo', type: 'Grade-A',       status: 'Available', image: '/properties/powai-tech-park.jpg',    images: ['/properties/powai-tech-park.jpg','/properties/bkc-premier.jpg','/properties/cyber-city-tower-a.jpg'], featured: true },
   ]),
 
   // FAQ
@@ -286,7 +286,7 @@ export function saveCMS(data) {
 
 // One-time, non-destructive migration: backfill default property images +
 // featured flags (by name) onto data saved before those fields existed.
-const SEED_VERSION = 1;
+const SEED_VERSION = 2;
 function seedDefaults() {
   let stored;
   try { stored = JSON.parse(localStorage.getItem(CMS_KEY) || '{}'); } catch { stored = {}; }
@@ -300,8 +300,9 @@ function seedDefaults() {
   props = props.map(p => {
     const d = defByName[p.name];
     if (d) {
-      if (!p.image && d.image) p.image = d.image;                 // add image if missing
-      if (p.featured === undefined && d.featured) p.featured = true; // honor default feature
+      if (!p.image && d.image) p.image = d.image;                          // add primary image
+      if ((!p.images || !p.images.length) && d.images) p.images = d.images; // add gallery
+      if (p.featured === undefined && d.featured) p.featured = true;        // honor default feature
     }
     return p;
   });
@@ -364,6 +365,9 @@ export function applyCMS() {
   let favs = [];
   try { favs = JSON.parse(localStorage.getItem('bayworks_favorites') || '[]'); } catch { favs = []; }
   const HEART_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+  const CHEV_L = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+  const CHEV_R = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
+  const imagesOf = (p) => (Array.isArray(p.images) && p.images.length) ? p.images : (p.image ? [p.image] : []);
 
   const propsGrid = document.getElementById('properties-grid');
   if (propsGrid) {
@@ -414,24 +418,28 @@ export function applyCMS() {
     let featured = props.map((p, i) => ({ p, i })).filter(x => x.p.featured);
     if (limit > 0) featured = featured.slice(0, limit);
     if (featured.length) {
-      featuredGrid.innerHTML = featured.map(({ p, i }) => {
+      const cardsHtml = featured.map(({ p, i }) => {
         const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];
-        const img = p.image
-          ? `<div class="featured-img"><img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" /></div>`
+        const imgs = imagesOf(p);
+        const gallery = imgs.length
+          ? `<div class="fcard-gallery">
+               <div class="fcard-imgs">${imgs.map(src => `<img src="${esc(src)}" alt="${esc(p.name)}" loading="lazy" />`).join('')}</div>
+               ${imgs.length > 1 ? `<button type="button" class="fcard-nav fcard-prev" aria-label="Previous image">${CHEV_L}</button><button type="button" class="fcard-nav fcard-next" aria-label="Next image">${CHEV_R}</button><span class="fcard-count">1/${imgs.length}</span>` : ''}
+             </div>`
           : `<div class="featured-img featured-img--empty">${PIN_SVG}<span>${esc(p.city || 'Project')}</span></div>`;
-        return `<article class="featured-card" data-idx="${i}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
-          ${img}
+        return `<article class="featured-card reveal" data-idx="${i}" tabindex="0" role="button" aria-label="View ${esc(p.name)}">
+          ${gallery}
           <div class="featured-body">
             <span class="property-status status--${statusSlug}">${p.status || 'Available'}</span>
             <h3>${p.name || ''}</h3>
             <p>${PIN_SVG} ${p.city || ''}${p.type ? ` · ${p.type}` : ''}</p>
             <div class="featured-foot">
-              <span class="property-price">${p.price || ''}</span>
-              <span class="featured-link">View details &rarr;</span>
+              <span class="featured-cta-btn" data-action="know-more">Know More</span>
             </div>
           </div>
         </article>`;
       }).join('');
+      featuredGrid.innerHTML = cardsHtml;
       if (featuredSection) featuredSection.style.display = '';
     } else if (featuredSection) {
       featuredSection.style.display = 'none';

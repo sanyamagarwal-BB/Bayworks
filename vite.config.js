@@ -13,6 +13,8 @@ export default defineConfig({
         properties: resolve(__dirname, 'properties.html'),
         about: resolve(__dirname, 'about.html'),
         admin: resolve(__dirname, 'admin.html'),
+        login: resolve(__dirname, 'login.html'),
+        dashboard: resolve(__dirname, 'dashboard.html'),
       },
     },
   },

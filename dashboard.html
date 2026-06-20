@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portal | BAYWORKS</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ═══ TOP BAR ════════════════════════════════════════════════ -->
+  <header class="dash-top">
+    <a href="/" class="auth-logo"><span class="logo-text" style="color:var(--ink)">BAYWORKS<sup class="logo-tm">™</sup></span></a>
+    <nav class="dash-top-nav">
+      <a href="/properties.html">Browse Properties</a>
+      <a href="/about.html">About</a>
+    </nav>
+    <div class="dash-account">
+      <span class="dash-avatar" id="dash-avatar">D</span>
+      <span class="dash-account-name" id="dash-name">Account</span>
+      <button class="btn-ghost dash-logout" id="dash-logout" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main class="dash-shell container">
+
+    <!-- Greeting -->
+    <section class="dash-hello">
+      <p class="label-pill">Client Portal</p>
+      <h1 class="dash-h1">Welcome back, <span id="dash-firstname">there</span></h1>
+      <p class="dash-sub">Here's everything happening with your office-space search.</p>
+    </section>
+
+    <!-- Stats -->
+    <section class="dash-stats" id="dash-stats"></section>
+
+    <!-- Two-column body -->
+    <div class="dash-grid">
+
+      <!-- Shortlist -->
+      <section class="dash-card dash-card-wide">
+        <div class="dash-card-head">
+          <h2>Shortlisted spaces</h2>
+          <a href="/properties.html" class="auth-link">Browse more</a>
+        </div>
+        <div class="dash-shortlist" id="dash-shortlist"></div>
+      </section>
+
+      <!-- Requirements -->
+      <section class="dash-card">
+        <div class="dash-card-head"><h2>Your requirements</h2></div>
+        <ul class="dash-list" id="dash-reqs"></ul>
+      </section>
+
+      <!-- Visits -->
+      <section class="dash-card">
+        <div class="dash-card-head"><h2>Upcoming site visits</h2></div>
+        <ul class="dash-list" id="dash-visits"></ul>
+      </section>
+
+      <!-- Profile -->
+      <section class="dash-card">
+        <div class="dash-card-head"><h2>Your profile</h2></div>
+        <dl class="dash-profile" id="dash-profile"></dl>
+        <a href="https://wa.me/919205005399" target="_blank" rel="noopener" class="btn-primary btn-block" style="margin-top:1rem">Talk to your advisor</a>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="/src/dashboard.js"></script>
+</body>
+</html>

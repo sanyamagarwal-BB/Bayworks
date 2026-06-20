@@ -1,8 +1,9 @@
 /* BAYWORKS — Main JS */
-import { applyCMS } from './cms.js';
+import { applyCMSFromAPI } from './cms-api.js';
 import { initCity } from './city.js';
 import { captureLead, flushLeadQueue } from './crm.js';
 import { track } from './analytics.js';
+import './nav-account.js';
 
 // Hero brief form — captures the lead to CRM, then opens WhatsApp pre-filled
 window.handleHeroBrief = function(e) {
@@ -31,7 +32,7 @@ window.handleHeroBrief = function(e) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  applyCMS();
+  applyCMSFromAPI();
   initNav();
   initReveal();
   initCounters();
@@ -232,9 +233,15 @@ function initProperties() {
 
 /* ── PROPERTY CARDS: per-card CTAs + detail modal ──────────────── */
 function initPropertyModal() {
-  const grid   = document.getElementById('properties-grid');
   const dialog = document.getElementById('property-modal');
-  if (!grid || !dialog) return;
+  // Modal close handlers run on any page that has the dialog (Home, Properties)
+  if (dialog) {
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.querySelector('[data-modal-close]')?.addEventListener('click', () => dialog.close());
+  }
+
+  const grid = document.getElementById('properties-grid');
+  if (!grid) return;   // listing-grid handlers only where the listing exists
 
   grid.addEventListener('click', (e) => {
     if (e.target.closest('.fav-btn')) return;            // favorite toggle handled elsewhere
@@ -253,9 +260,6 @@ function initPropertyModal() {
     const card = e.target.closest('.property-card');
     if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openPropertyModal(+card.dataset.idx); }
   });
-
-  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
-  dialog.querySelector('[data-modal-close]')?.addEventListener('click', () => dialog.close());
 }
 
 function openPropertyModal(idx) {
@@ -264,12 +268,13 @@ function openPropertyModal(idx) {
   if (!p || !dialog) return;
 
   const statusSlug = (p.status || 'Available').toLowerCase().split(' ')[0];
-  const waMsg = encodeURIComponent(`Hi BAYWORKS, I'm interested in "${p.name || 'a property'}" (${p.city || ''}). Please share details.`);
-  const img = p.image
-    ? `<img src="${p.image}" alt="${p.name || ''}" />`
+  const heroSrc = p.image || (Array.isArray(p.images) && p.images[0]) || '';
+  const img = heroSrc
+    ? `<img src="${heroSrc}" alt="${p.name || ''}" />`
     : `<div class="property-modal-img--empty">${p.city || 'Property'}</div>`;
 
-  dialog.querySelector('#property-modal-body').innerHTML = `
+  const body = dialog.querySelector('#property-modal-body');
+  body.innerHTML = `
     <div class="property-modal-img">${img}</div>
     <div class="property-modal-info">
       <span class="property-status status--${statusSlug}">${p.status || 'Available'}</span>
@@ -278,15 +283,45 @@ function openPropertyModal(idx) {
         <div><span>City</span><strong>${p.city || '—'}</strong></div>
         <div><span>Size</span><strong>${p.size || '—'}</strong></div>
         <div><span>Type</span><strong>${p.type || '—'}</strong></div>
-        <div><span>Price</span><strong>${p.price || '—'}</strong></div>
+        <div><span>Status</span><strong>${p.status || 'Available'}</strong></div>
       </div>
-      <div class="property-modal-actions">
-        <button type="button" class="btn-primary" data-modal-book>Book a Tour</button>
-        <a class="btn-ghost" href="https://wa.me/919205005399?text=${waMsg}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+      <div class="connect-box">
+        <p class="connect-title">Interested? Leave your number and our team will connect you.</p>
+        <input type="tel" id="connect-phone" class="connect-input" placeholder="Your phone number" autocomplete="tel" />
+        <div class="connect-actions">
+          <button type="button" class="btn-primary" data-connect="whatsapp">Connect on WhatsApp</button>
+          <button type="button" class="btn-ghost" data-connect="call">Request a Call</button>
+        </div>
+        <p class="connect-hint">We'll only use this to reach you about this property.</p>
       </div>
     </div>`;
 
-  dialog.querySelector('[data-modal-book]')?.addEventListener('click', () => { dialog.close(); bookTour(idx); });
+  const phoneInput = body.querySelector('#connect-phone');
+  body.querySelectorAll('[data-connect]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const phone = (phoneInput.value || '').trim();
+      if (phone.replace(/\D/g, '').length < 10) { alert('Please enter a valid phone number (with country/area code).'); phoneInput.focus(); return; }
+      const method = btn.dataset.connect;
+
+      if (method === 'whatsapp') {
+        if (!confirm(`Connect with BAYWORKS on WhatsApp about "${p.name}"?`)) return;
+        captureLead({ name: `Featured enquiry — ${p.name}`, phone, city: p.city, intent: 'HOT', source: 'website_featured_whatsapp', budget: p.name, utm: { source: 'website', medium: 'featured_connect', method: 'whatsapp', property: p.name } });
+        track('lead_captured', { source: 'website_featured_whatsapp' });
+        track('featured_connect', { method: 'whatsapp', name: p.name });
+        const msg = encodeURIComponent(`Hi BAYWORKS, I'm interested in "${p.name}" (${p.city}). My number: ${phone}. Please connect.`);
+        window.open(`https://wa.me/919205005399?text=${msg}`, '_blank', 'noopener');
+        dialog.close();
+      } else {
+        if (!confirm(`Request a callback on ${phone} about "${p.name}"?`)) return;
+        captureLead({ name: `Callback request — ${p.name}`, phone, city: p.city, intent: 'HOT', source: 'website_featured_call', budget: p.name, utm: { source: 'website', medium: 'featured_connect', method: 'call', property: p.name } });
+        track('lead_captured', { source: 'website_featured_call' });
+        track('featured_connect', { method: 'call', name: p.name });
+        alert(`Thanks! Our team will call you on ${phone} shortly.`);
+        dialog.close();
+      }
+    });
+  });
+
   dialog.showModal();
   track('property_view', { name: p.name, city: p.city });
 }
@@ -298,25 +333,84 @@ function initFeatured() {
   const open = (card) => {
     const idx = +card.dataset.idx;
     track('featured_click', { idx, name: (window.__BAYWORKS_PROPS || [])[idx]?.name });
-    const listing = document.getElementById('properties');
-    const modal = document.getElementById('property-modal');
-    if (listing && modal) {
-      // On the Properties page: scroll to the listing and open the detail in place
-      listing.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => openPropertyModal(idx), 480);
+    // Open the detail popup in place (every page now has the modal) — no routing
+    if (document.getElementById('property-modal')) {
+      openPropertyModal(idx);
     } else {
-      // On the Home teaser: deep-link into the Properties page, opening this property
-      window.location.href = `/properties.html?property=${idx}`;
+      window.location.href = `/properties.html?property=${idx}`;   // fallback
     }
   };
   grid.addEventListener('click', (e) => {
+    // Per-card image carousel arrows — handle, don't open the card
+    const navBtn = e.target.closest('.fcard-nav');
+    if (navBtn) {
+      e.stopPropagation();
+      const track = navBtn.closest('.fcard-gallery')?.querySelector('.fcard-imgs');
+      if (track) track.scrollBy({ left: (navBtn.classList.contains('fcard-next') ? 1 : -1) * track.clientWidth, behavior: 'smooth' });
+      return;
+    }
     const card = e.target.closest('.featured-card');
     if (card) open(card);
   });
   grid.addEventListener('keydown', (e) => {
     const card = e.target.closest('.featured-card');
-    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(card); }
+    if (card && (e.key === 'Enter' || e.key === ' ') && !e.target.closest('.fcard-nav')) { e.preventDefault(); open(card); }
   });
+
+  // Keep each card's "n/total" badge in sync as its images scroll (scroll doesn't bubble → capture)
+  grid.addEventListener('scroll', (e) => {
+    const t = e.target;
+    if (t.classList && t.classList.contains('fcard-imgs')) {
+      const i = Math.round(t.scrollLeft / t.clientWidth);
+      const badge = t.parentElement.querySelector('.fcard-count');
+      if (badge) badge.textContent = `${i + 1}/${t.children.length}`;
+    }
+  }, true);
+
+  // Ribbon left/right arrows scroll the whole row (~2 cards at a time)
+  const prev = document.getElementById('featured-prev');
+  const next = document.getElementById('featured-next');
+  if (prev && next) {
+    const step = () => {
+      const card = grid.querySelector('.featured-card');
+      return (card ? card.getBoundingClientRect().width + 24 : grid.clientWidth * 0.8) * 2;
+    };
+    prev.addEventListener('click', () => grid.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => grid.scrollBy({ left: step(), behavior: 'smooth' }));
+    const updateArrows = () => {
+      prev.toggleAttribute('disabled', grid.scrollLeft <= 4);
+      next.toggleAttribute('disabled', grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 4);
+    };
+    grid.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+    setTimeout(updateArrows, 400);   // re-check after images load
+  }
+
+  // Gentle auto-float (ping-pong) — pauses when the cursor / finger is on it
+  if (grid.classList.contains('featured-row') &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const ribbon = grid.closest('.featured-ribbon') || grid;
+    let dir = 1, paused = false;
+    const SPEED = 1.6;                                  // px per frame (~96px/s)
+    const pause = () => { paused = true; };
+    const resume = () => { if (!ribbon.matches(':hover')) paused = false; };
+    ribbon.addEventListener('mouseenter', pause);
+    ribbon.addEventListener('mouseleave', () => { paused = false; });
+    ribbon.addEventListener('pointerdown', pause);
+    ribbon.addEventListener('pointerup', () => setTimeout(resume, 1200));
+    ribbon.addEventListener('focusin', pause);
+    ribbon.addEventListener('focusout', () => setTimeout(resume, 1200));
+    const tick = () => {
+      if (!paused && grid.scrollWidth > grid.clientWidth + 1) {
+        grid.scrollLeft += dir * SPEED;
+        if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 1) dir = -1;
+        else if (grid.scrollLeft <= 0) dir = 1;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
 }
 
 function bookTour(idx) {

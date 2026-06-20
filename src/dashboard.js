@@ -1,0 +1,116 @@
+/* BAYWORKS — Customer portal dashboard
+ * Auth-guarded landing page after login. Renders the signed-in customer's
+ * overview: stats, shortlisted spaces, requirements, site visits, profile.
+ *
+ * Data: when the session is API-backed (CRM up), data is fetched live and
+ * scoped to this customer's lead. Otherwise (demo/offline) it shows mock data.
+ * Any API failure mid-session also degrades to mock so the page never breaks.
+ */
+import { requireAuth, getCurrentUser, logout, isApiSession } from './auth.js';
+import * as portal from './portal-api.js';
+
+// Block render until authenticated. requireAuth() redirects (with ?next=) when
+// logged out; we simply stop here without throwing so the console stays clean.
+requireAuth('/login.html');
+
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const user = getCurrentUser() || { name: 'Client', email: '' };
+const first = (user.name || 'there').split(' ')[0];
+
+/* ── header / identity ──────────────────────────────────────── */
+$('#dash-firstname').textContent = first;
+$('#dash-name').textContent = first;
+$('#dash-avatar').textContent = (user.name || user.email || '?').trim().charAt(0).toUpperCase();
+$('#dash-logout').addEventListener('click', () => { logout(); location.href = '/'; });
+
+/* ── profile (from session, always available) ───────────────── */
+$('#dash-profile').innerHTML = [
+  ['Name', user.name], ['Company', user.company || '—'],
+  ['Email', user.email], ['Phone', user.phone || '—'],
+].map(([k, v]) => `<div class="dash-prow"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+
+/* ── mock data (demo / offline / API failure fallback) ──────── */
+const MOCK = {
+  stats: [
+    { label: 'Active requirements', value: 2 },
+    { label: 'Shortlisted spaces', value: 3 },
+    { label: 'Scheduled visits', value: 1 },
+    { label: 'Proposals received', value: 1 },
+  ],
+  shortlist: [
+    { name: 'Prestige Tech Park — Tower B', city: 'Bengaluru', meta: '40 seats', rate: '₹95/sq.ft', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=70&auto=format&fit=crop' },
+    { name: 'One BKC — 14th Floor', city: 'Mumbai', meta: '60 seats', rate: '₹160/sq.ft', img: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=70&auto=format&fit=crop' },
+    { name: 'Cyber Hub — Block C', city: 'Gurugram', meta: '25 seats', rate: '₹110/sq.ft', img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=70&auto=format&fit=crop' },
+  ],
+  requirements: [
+    { title: '40–50 managed seats, Bengaluru', status: 'In progress', meta: 'Updated 2 days ago' },
+    { title: 'HQ relocation, Mumbai BKC', status: 'Sourcing', meta: 'Updated 5 days ago' },
+  ],
+  visits: [
+    { title: 'Prestige Tech Park — Tower B', when: 'Tue, 24 Jun · 11:00 AM', meta: 'With your advisor' },
+  ],
+};
+
+const fmtVisit = (iso) => {
+  const d = new Date(iso);
+  return isNaN(d) ? String(iso) : d.toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+};
+
+/** Fetch live, customer-scoped data; fall back to MOCK on any failure. */
+async function loadPortalData() {
+  if (!isApiSession()) return MOCK;
+  try {
+    const [s, r, sl, v] = await Promise.all([
+      portal.summary(), portal.requirement(), portal.shortlist(), portal.visits(),
+    ]);
+    return {
+      stats: s.stats,
+      shortlist: sl.items.map((p) => ({ name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '' })),
+      requirements: r.items,
+      visits: v.items.map((x) => ({ title: x.title, when: fmtVisit(x.when), meta: x.status })),
+    };
+  } catch {
+    return MOCK; // CRM down or session invalid → never break the page
+  }
+}
+
+/* ── render ─────────────────────────────────────────────────── */
+function render(data) {
+  $('#dash-stats').innerHTML = data.stats.map((s) => `
+    <div class="dash-stat">
+      <span class="dash-stat-val">${esc(s.value)}</span>
+      <span class="dash-stat-label">${esc(s.label)}</span>
+    </div>`).join('');
+
+  $('#dash-shortlist').innerHTML = data.shortlist.length ? data.shortlist.map((p) => `
+    <article class="dash-prop">
+      <div class="dash-prop-img"${p.img ? ` style="background-image:url('${esc(p.img)}')"` : ''}></div>
+      <div class="dash-prop-body">
+        <h3>${esc(p.name)}</h3>
+        <p class="dash-prop-meta">${esc([p.city, p.meta].filter(Boolean).join(' · '))}</p>
+        <p class="dash-prop-rate">${esc(p.rate)}</p>
+      </div>
+    </article>`).join('') : `<p class="dash-empty">No shortlisted spaces yet. <a href="/properties.html" class="auth-link">Browse properties</a></p>`;
+
+  $('#dash-reqs').innerHTML = data.requirements.length ? data.requirements.map((r) => `
+    <li class="dash-li">
+      <div>
+        <p class="dash-li-title">${esc(r.title)}</p>
+        <p class="dash-li-meta">${esc(r.meta)}</p>
+      </div>
+      <span class="dash-tag">${esc(r.status)}</span>
+    </li>`).join('') : `<li class="dash-empty">No active requirements yet.</li>`;
+
+  $('#dash-visits').innerHTML = data.visits.length ? data.visits.map((v) => `
+    <li class="dash-li">
+      <div>
+        <p class="dash-li-title">${esc(v.title)}</p>
+        <p class="dash-li-meta">${esc(v.meta)}</p>
+      </div>
+      <span class="dash-tag dash-tag-green">${esc(v.when)}</span>
+    </li>`).join('') : `<li class="dash-empty">No visits scheduled yet.</li>`;
+}
+
+loadPortalData().then(render);
