@@ -1,5 +1,7 @@
 /* BAYWORKS — Main JS */
 import { applyCMSFromAPI } from './cms-api.js';
+import { applyCMS, CMS_KEY } from './cms.js';
+import { loadInventory } from './inventory-api.js';
 import { initCity } from './city.js';
 import { captureLead, flushLeadQueue } from './crm.js';
 import { track } from './analytics.js';
@@ -32,7 +34,7 @@ window.handleHeroBrief = function(e) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  applyCMSFromAPI();
+  applyCMSFromAPI().then(hydrateLiveInventory);
   initNav();
   initReveal();
   initCounters();
@@ -46,6 +48,27 @@ document.addEventListener('DOMContentLoaded', () => {
   flushLeadQueue();   // retry any leads queued while the CRM was unreachable
   track('page_view', { title: document.title });
 });
+
+/* Replace the CMS/mock listings with live CRM inventory when the CRM is up.
+ * Reuses the existing render path (applyCMS) via a transient CMS-store patch —
+ * same approach as cms-api.js — then restores the store. If the CRM is
+ * unreachable, loadInventory() returns null and the CMS/mock listings stay. */
+async function hydrateLiveInventory() {
+  if (!document.getElementById('properties-grid') && !document.getElementById('featured-grid')) return;
+  const live = await loadInventory();
+  if (!live) return;
+  const prev = localStorage.getItem(CMS_KEY);
+  try {
+    const cur = prev ? JSON.parse(prev) : {};
+    localStorage.setItem(CMS_KEY, JSON.stringify({ ...cur, properties_list: JSON.stringify(live) }));
+    applyCMS(); // re-render grid / featured / booking dropdown from live units
+  } catch (e) {
+    console.warn('[inventory] live hydrate failed:', e);
+  } finally {
+    if (prev === null) localStorage.removeItem(CMS_KEY); // DOM already rendered; restore store
+    else localStorage.setItem(CMS_KEY, prev);
+  }
+}
 
 /* Open a specific property if arrived via /properties.html?property=<idx> */
 function maybeOpenDeepLinkedProperty() {
