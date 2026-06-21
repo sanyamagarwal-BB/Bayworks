@@ -42,8 +42,17 @@ function save(res) {
 }
 
 export async function register(d) { return save(await req('/partner-portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
-export async function login(d)    { return save(await req('/partner-portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+export async function login(d) {
+  const res = await req('/partner-portal/auth/login', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } });
+  if (res?.twoFactorRequired) return res;           // needs a 2FA code; don't save yet
+  return save(res);
+}
+export async function verify2fa(ticket, code) { return save(await req('/partner-portal/auth/2fa', { method: 'POST', body: { ticket, code } })); }
 export const forgotPassword = (email) => req('/partner-portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
+export const twoFaStatus  = ()     => req('/partner-portal/2fa/status',  { auth: true });
+export const twoFaSetup   = ()     => req('/partner-portal/2fa/setup',   { method: 'POST', auth: true });
+export const twoFaEnable  = (code) => req('/partner-portal/2fa/enable',  { method: 'POST', body: { code }, auth: true });
+export const twoFaDisable = (code) => req('/partner-portal/2fa/disable', { method: 'POST', body: { code }, auth: true });
 
 export const me          = () => req('/partner-portal/me',          { auth: true });
 export const summary     = () => req('/partner-portal/summary',     { auth: true });

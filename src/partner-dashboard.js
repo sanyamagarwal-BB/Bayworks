@@ -98,3 +98,38 @@ load();
 
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/partner-portal', tokenKey: 'bayworks_partner_token' });
+
+/* ── security / 2FA ─────────────────────────────────────────── */
+(function initSecurity() {
+  const NS = partner;
+  const card = document.getElementById('dash-security-card');
+  const el = document.getElementById('dash-2fa');
+  if (!card || !el) return;
+  const render = (enabled) => {
+    el.innerHTML = enabled
+      ? `<div class="sec-row"><div><p class="dash-li-title">Two-factor authentication</p><p class="dash-li-meta">Enabled — a code is required at sign-in</p></div><span class="dash-tag dash-tag-green">ON</span></div><button type="button" class="btn-ghost btn-sm" data-act="disable" style="margin-top:.8rem">Disable 2FA</button>`
+      : `<div class="sec-row"><div><p class="dash-li-title">Two-factor authentication</p><p class="dash-li-meta">Add an authenticator app for extra security</p></div><span class="dash-tag">OFF</span></div><button type="button" class="btn-primary btn-sm" data-act="enable" style="margin-top:.8rem">Enable 2FA</button>`;
+  };
+  el.addEventListener('click', async (e) => {
+    const act = e.target.closest('[data-act]')?.dataset.act; if (!act) return;
+    if (act === 'enable') {
+      el.innerHTML = `<p class="dash-li-meta">Generating…</p>`;
+      try { const s = await NS.twoFaSetup();
+        el.innerHTML = `<p class="dash-li-meta">Scan with Google Authenticator or Authy, then enter the 6-digit code.</p>
+          <img src="${s.qr}" alt="2FA QR" style="width:160px;height:160px;margin:.6rem 0;border:1px solid var(--gray-200);border-radius:8px" />
+          <p class="dash-li-meta" style="word-break:break-all">Manual key: <code>${esc(s.secret)}</code></p>
+          <div style="display:flex;gap:.5rem;margin-top:.6rem"><input id="tf-en-code" class="prop-filter" inputmode="numeric" maxlength="6" placeholder="123456" style="width:130px" /><button type="button" class="btn-primary btn-sm" data-act="confirm-enable">Verify &amp; enable</button></div><p class="field-err" id="tf-en-err"></p>`;
+      } catch { el.innerHTML = `<p class="dash-empty">Could not start setup.</p>`; }
+    } else if (act === 'confirm-enable') {
+      try { await NS.twoFaEnable(document.getElementById('tf-en-code').value.trim()); toast('Two-factor authentication enabled.'); render(true); }
+      catch (err) { document.getElementById('tf-en-err').textContent = err.message || 'Invalid code.'; }
+    } else if (act === 'disable') {
+      el.innerHTML = `<p class="dash-li-meta">Enter a current code to turn off 2FA.</p><div style="display:flex;gap:.5rem;margin-top:.6rem"><input id="tf-dis-code" class="prop-filter" inputmode="numeric" maxlength="6" placeholder="123456" style="width:130px" /><button type="button" class="btn-ghost btn-sm" data-act="confirm-disable">Disable</button></div><p class="field-err" id="tf-dis-err"></p>`;
+    } else if (act === 'confirm-disable') {
+      try { await NS.twoFaDisable(document.getElementById('tf-dis-code').value.trim()); toast('Two-factor authentication disabled.'); render(false); }
+      catch (err) { document.getElementById('tf-dis-err').textContent = err.message || 'Invalid code.'; }
+    }
+  });
+  card.hidden = false;
+  NS.twoFaStatus().then((s) => render(s.enabled)).catch(() => { el.innerHTML = `<p class="dash-empty">Could not load security settings.</p>`; });
+})();

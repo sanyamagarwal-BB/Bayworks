@@ -1,5 +1,5 @@
 /* BAYWORKS — Channel Partner login page controller */
-import { register, login, isAuthenticated } from './partner-api.js';
+import { register, login, verify2fa, isAuthenticated } from './partner-api.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -9,8 +9,9 @@ const params = new URLSearchParams(location.search);
 const next = safeNext(params.get('next')) || '/partner-dashboard.html';
 if (isAuthenticated()) location.replace(next);
 
-const views = { signin: $('#form-signin'), signup: $('#form-signup') };
+const views = { signin: $('#form-signin'), signup: $('#form-signup'), twofa: $('#form-2fa') };
 const indicator = $('.auth-tab-indicator');
+let pending2faTicket = null;
 
 function showView(name) {
   Object.entries(views).forEach(([k, el]) => el.classList.toggle('is-active', k === name));
@@ -54,8 +55,24 @@ views.signin.addEventListener('submit', async (e) => {
   if (!pass) ok = setErr('si-pass', 'Password is required.') && ok;
   if (!ok) return;
   const btn = $('#si-submit'); busy(btn, true);
-  try { await login({ email, password: pass }); showToast('Signed in. Redirecting…', 'success'); setTimeout(() => location.replace(next), 500); }
-  catch (err) { showToast(err.message || 'Sign in failed.'); }
+  try {
+    const r = await login({ email, password: pass });
+    if (r && r.twoFactorRequired) { pending2faTicket = r.ticket; busy(btn, false); showView('twofa'); return; }
+    showToast('Signed in. Redirecting…', 'success'); setTimeout(() => location.replace(next), 500);
+  } catch (err) { showToast(err.message || 'Sign in failed.'); }
+  finally { busy(btn, false); }
+});
+
+views.twofa.addEventListener('submit', async (e) => {
+  e.preventDefault(); clearErrs(views.twofa);
+  const code = $('#tf-code').value.trim();
+  if (!/^\d{6}$/.test(code)) return setErr('tf-code', 'Enter the 6-digit code.');
+  if (!pending2faTicket) { showView('signin'); return; }
+  const btn = $('#tf-submit'); busy(btn, true);
+  try {
+    await verify2fa(pending2faTicket, code);
+    showToast('Signed in. Redirecting…', 'success'); setTimeout(() => location.replace(next), 500);
+  } catch (err) { setErr('tf-code', err.message || 'Invalid code.'); }
   finally { busy(btn, false); }
 });
 

@@ -100,6 +100,17 @@
         <p class="auth-demo-hint">New partner accounts start as <strong>Pending</strong> until approved by BayWorks.</p>
         <button type="submit" class="btn-primary btn-block" id="su-submit"><span class="btn-label">Apply &amp; create account</span><span class="btn-spinner" aria-hidden="true"></span></button>
       </form>
+
+      <form class="auth-form" id="form-2fa" novalidate>
+        <header class="auth-form-head"><h2>Two-factor authentication</h2><p>Enter the 6-digit code from your authenticator app.</p></header>
+        <div class="form-row">
+          <label for="tf-code">Authentication code</label>
+          <input type="text" id="tf-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required />
+          <small class="field-err" data-err="tf-code"></small>
+        </div>
+        <button type="submit" class="btn-primary btn-block" id="tf-submit"><span class="btn-label">Verify &amp; sign in</span><span class="btn-spinner" aria-hidden="true"></span></button>
+        <button type="button" class="auth-link auth-link-center" data-view="signin">Cancel</button>
+      </form>
     </section>
   </main>
   <script type="module" src="/src/partner-login.js"></script>

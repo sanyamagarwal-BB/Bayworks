@@ -40,8 +40,17 @@ function save(res) {
 }
 
 export async function register(d) { return save(await req('/developer-portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
-export async function login(d)    { return save(await req('/developer-portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+export async function login(d) {
+  const res = await req('/developer-portal/auth/login', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } });
+  if (res?.twoFactorRequired) return res;
+  return save(res);
+}
+export async function verify2fa(ticket, code) { return save(await req('/developer-portal/auth/2fa', { method: 'POST', body: { ticket, code } })); }
 export const forgotPassword = (email) => req('/developer-portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
+export const twoFaStatus  = ()     => req('/developer-portal/2fa/status',  { auth: true });
+export const twoFaSetup   = ()     => req('/developer-portal/2fa/setup',   { method: 'POST', auth: true });
+export const twoFaEnable  = (code) => req('/developer-portal/2fa/enable',  { method: 'POST', body: { code }, auth: true });
+export const twoFaDisable = (code) => req('/developer-portal/2fa/disable', { method: 'POST', body: { code }, auth: true });
 
 export const me       = () => req('/developer-portal/me',       { auth: true });
 export const summary  = () => req('/developer-portal/summary',  { auth: true });
