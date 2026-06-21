@@ -1,0 +1,61 @@
+/* BAYWORKS — Channel Partner portal API client + session
+ * Talks to the CRM partner-portal endpoints (/crm-api/partner-portal/*).
+ * Self-contained session (token + cached user in localStorage). No offline
+ * fallback — the partner portal requires the CRM (it's all live CRM data).
+ */
+const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
+const BASE = env.VITE_CRM_BASE || '/crm-api';
+const CAPTURE_TOKEN = env.VITE_CRM_TOKEN || 'cap_ohlt1p4glsp';
+const TOKEN_KEY = 'bayworks_partner_token';
+const USER_KEY  = 'bayworks_partner_user';
+
+export class ApiError extends Error {
+  constructor(message, { code, status, network } = {}) {
+    super(message); this.name = 'ApiError'; this.code = code; this.status = status; this.network = !!network;
+  }
+}
+
+const token = () => localStorage.getItem(TOKEN_KEY);
+
+async function req(path, { method = 'GET', body, auth = false } = {}) {
+  let res;
+  try {
+    res = await fetch(BASE + path, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(auth ? { Authorization: `Bearer ${token()}` } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch { throw new ApiError('Network unreachable', { network: true }); }
+  if (res.status === 401 && auth) { logout(); throw new ApiError('Session expired', { status: 401 }); }
+  let data = null; try { data = await res.json(); } catch { /* empty */ }
+  if (!res.ok) {
+    const msg = (data && (Array.isArray(data.message) ? data.message[0] : data.message)) || `HTTP ${res.status}`;
+    throw new ApiError(msg, { status: res.status, code: data?.code, network: res.status >= 500 });
+  }
+  return data;
+}
+
+function save(res) {
+  if (res?.accessToken) localStorage.setItem(TOKEN_KEY, res.accessToken);
+  if (res?.user) localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+  return res?.user;
+}
+
+export async function register(d) { return save(await req('/partner-portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+export async function login(d)    { return save(await req('/partner-portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+
+export const me          = () => req('/partner-portal/me',          { auth: true });
+export const summary     = () => req('/partner-portal/summary',     { auth: true });
+export const leads       = () => req('/partner-portal/leads',       { auth: true });
+export const commissions = () => req('/partner-portal/commissions', { auth: true });
+
+export const isAuthenticated = () => !!token();
+export function cachedUser() { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
+export function logout() { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); }
+
+/** Guard a partner page: redirect to login (with ?next=) if not signed in. */
+export function requireAuth(loginUrl = '/partner-login.html') {
+  if (isAuthenticated()) return true;
+  location.replace(`${loginUrl}?next=${encodeURIComponent(location.pathname + location.search)}`);
+  return false;
+}

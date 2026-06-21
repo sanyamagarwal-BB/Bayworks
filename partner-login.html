@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Channel Partner Login | BAYWORKS</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-shell">
+    <aside class="auth-aside" aria-hidden="true">
+      <a href="/" class="auth-logo"><span class="logo-text">BAYWORKS<sup class="logo-tm">™</sup></span></a>
+      <div class="auth-aside-body">
+        <p class="label-pill label-pill-white">Channel Partner Portal</p>
+        <h1 class="auth-aside-h">Refer deals.<br>Track every rupee.</h1>
+        <ul class="auth-aside-list">
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Submit & track your referred leads</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Live deal status across the pipeline</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Transparent commission payouts</li>
+        </ul>
+      </div>
+      <p class="auth-aside-foot">For brokers & IPCs partnering with BayWorks.</p>
+    </aside>
+
+    <section class="auth-main">
+      <a href="/" class="auth-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Back to site
+      </a>
+
+      <div class="auth-tabs" role="tablist" aria-label="Sign in or become a partner">
+        <button class="auth-tab is-active" role="tab" aria-selected="true"  data-view="signin">Sign In</button>
+        <button class="auth-tab"           role="tab" aria-selected="false" data-view="signup">Become a Partner</button>
+        <span class="auth-tab-indicator" aria-hidden="true"></span>
+      </div>
+
+      <div class="auth-toast" id="toast" role="status" aria-live="polite"></div>
+
+      <form class="auth-form is-active" id="form-signin" novalidate>
+        <header class="auth-form-head"><h2>Partner sign in</h2><p>Access your referrals and commissions.</p></header>
+        <div class="form-row">
+          <label for="si-email">Email</label>
+          <input type="email" id="si-email" autocomplete="email" placeholder="you@brokerage.com" required />
+          <small class="field-err" data-err="si-email"></small>
+        </div>
+        <div class="form-row">
+          <label for="si-pass">Password</label>
+          <div class="input-pass">
+            <input type="password" id="si-pass" autocomplete="current-password" placeholder="Your password" required />
+            <button type="button" class="pass-toggle" aria-label="Show password" data-target="si-pass">
+              <svg class="eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off" viewBox="0 0 24 24" style="display:none"><path d="M9.9 4.2A10.9 10.9 0 0 1 12 4c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M6.6 6.6A18 18 0 0 0 2 11s3.5 7 10 7a10.9 10.9 0 0 0 4.1-.8"/><path d="m2 2 20 20"/></svg>
+            </button>
+          </div>
+          <small class="field-err" data-err="si-pass"></small>
+        </div>
+        <button type="submit" class="btn-primary btn-block" id="si-submit"><span class="btn-label">Sign In</span><span class="btn-spinner" aria-hidden="true"></span></button>
+      </form>
+
+      <form class="auth-form" id="form-signup" novalidate>
+        <header class="auth-form-head"><h2>Become a partner</h2><p>Apply to refer deals to BayWorks.</p></header>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label for="su-name">Full name</label>
+            <input type="text" id="su-name" autocomplete="name" placeholder="Jane Doe" required />
+            <small class="field-err" data-err="su-name"></small>
+          </div>
+          <div class="form-row">
+            <label for="su-company">Brokerage / company</label>
+            <input type="text" id="su-company" autocomplete="organization" placeholder="Acme Realty" />
+            <small class="field-err" data-err="su-company"></small>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="su-email">Email</label>
+          <input type="email" id="su-email" autocomplete="email" placeholder="you@brokerage.com" required />
+          <small class="field-err" data-err="su-email"></small>
+        </div>
+        <div class="form-row">
+          <label for="su-phone">Phone</label>
+          <input type="tel" id="su-phone" autocomplete="tel" placeholder="+91 90000 00000" />
+          <small class="field-err" data-err="su-phone"></small>
+        </div>
+        <div class="form-row">
+          <label for="su-pass">Password</label>
+          <div class="input-pass">
+            <input type="password" id="su-pass" autocomplete="new-password" placeholder="Create a strong password" required />
+            <button type="button" class="pass-toggle" aria-label="Show password" data-target="su-pass">
+              <svg class="eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off" viewBox="0 0 24 24" style="display:none"><path d="M9.9 4.2A10.9 10.9 0 0 1 12 4c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M6.6 6.6A18 18 0 0 0 2 11s3.5 7 10 7a10.9 10.9 0 0 0 4.1-.8"/><path d="m2 2 20 20"/></svg>
+            </button>
+          </div>
+          <small class="field-err" data-err="su-pass"></small>
+        </div>
+        <p class="auth-demo-hint">New partner accounts start as <strong>Pending</strong> until approved by BayWorks.</p>
+        <button type="submit" class="btn-primary btn-block" id="su-submit"><span class="btn-label">Apply &amp; create account</span><span class="btn-spinner" aria-hidden="true"></span></button>
+      </form>
+    </section>
+  </main>
+  <script type="module" src="/src/partner-login.js"></script>
+</body>
+</html>

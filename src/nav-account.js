@@ -1,9 +1,38 @@
 /* BAYWORKS — Nav account widget
- * Injects a "Login" link into every page's nav, or an account chip with a
- * dropdown (My Portal / Sign out) when a customer session is active.
- * Imported once from main.js so it runs on all marketing pages.
+ * Injects a "Login" dropdown (Customer / Team / Developer / Partner) into every
+ * page's nav, or an account chip (My Portal / Sign out) when a customer session
+ * is active. Imported once from main.js so it runs on all marketing pages.
  */
 import { getSession, logout } from './auth.js';
+
+const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
+const CRM_WEB_URL = env.VITE_CRM_WEB_URL || 'http://localhost:5180/login';
+
+// The login options shown in the dropdown nest.
+const LOGINS = [
+  { label: 'Customer Login',        sub: 'Clients & corporates',      href: '/login.html' },
+  { label: 'Team / CRM Login',      sub: 'BayWorks staff',            href: CRM_WEB_URL, external: true },
+  { label: 'Developer Login',       sub: 'Landlords & developers',    href: '/developer-login.html' },
+  { label: 'Channel Partner Login', sub: 'Brokers & IPCs',            href: '/partner-login.html' },
+];
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* Wire a trigger button + menu: toggle, outside-click close, Escape close. */
+function wireDropdown(wrap) {
+  const btn = wrap.querySelector('[aria-haspopup]');
+  const menu = wrap.querySelector('[role="menu"]');
+  const close = () => { wrap.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  menu.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+}
 
 function build() {
   const right = document.querySelector('.nav .header-right');
@@ -13,21 +42,26 @@ function build() {
   const mobile = document.querySelector('.nav-mobile');
 
   if (!session) {
-    const link = document.createElement('a');
-    link.href = '/login.html';
-    link.className = 'nav-login-link';
-    link.dataset.navAccount = 'guest';
-    link.textContent = 'Login';
-    right.insertBefore(link, right.querySelector('.btn-connect') || null);
-
-    // Mobile menu also needs an entry — the desktop button is hidden on narrow screens.
-    if (mobile && !mobile.querySelector('[data-nav-account-m]')) {
-      const m = document.createElement('a');
-      m.href = '/login.html';
-      m.dataset.navAccountM = 'guest';
-      m.textContent = 'Login';
-      mobile.insertBefore(m, mobile.firstChild);
-    }
+    const wrap = document.createElement('div');
+    wrap.className = 'nav-login';
+    wrap.dataset.navAccount = 'guest';
+    const CHEV = '<svg class="login-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const items = LOGINS.map((l) => l.soon
+      ? `<span class="login-item is-soon" role="menuitem" aria-disabled="true">
+           <span class="login-item-main"><strong>${esc(l.label)}</strong><small>${esc(l.sub)}</small></span>
+           <span class="login-soon">Soon</span>
+         </span>`
+      : `<a class="login-item" role="menuitem" href="${esc(l.href)}"${l.external ? ' target="_blank" rel="noopener"' : ''}>
+           <span class="login-item-main"><strong>${esc(l.label)}</strong><small>${esc(l.sub)}</small></span>
+           ${l.external ? '<svg class="login-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>' : ''}
+         </a>`).join('');
+    wrap.innerHTML = `
+      <button type="button" class="nav-login-link" aria-haspopup="true" aria-expanded="false">Login ${CHEV}</button>
+      <div class="login-menu" role="menu" aria-label="Login options">${items}</div>`;
+    right.insertBefore(wrap, right.querySelector('.btn-connect') || null);
+    wireDropdown(wrap);
+    // The Login dropdown stays visible in the bar (left of the hamburger) on mobile,
+    // so no separate hamburger-menu entry is needed for guests.
     return;
   }
 
