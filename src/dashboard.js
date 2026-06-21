@@ -147,5 +147,66 @@ function toast(msg, isErr = false) {
 
 loadPortalData().then(render);
 
+/* ── proposals / quotes ─────────────────────────────────────── */
+const inr = (n) => `₹${Math.round(Number(n) || 0).toLocaleString('en-IN')}`;
+const PSTATUS = { ACCEPTED: 'dash-tag-green' };
+const propsEl = $('#dash-proposals');
+
+async function loadProposals() {
+  if (!isApiSession()) { propsEl.innerHTML = `<p class="dash-empty">No proposals yet.</p>`; return; }
+  let items = [];
+  try { items = (await portal.proposals()).items; } catch { propsEl.innerHTML = `<p class="dash-empty">Could not load proposals.</p>`; return; }
+  propsEl.innerHTML = items.length ? items.map((q) => `
+    <div class="prop-row" data-id="${esc(q.id)}" data-status="${esc(q.status)}">
+      <div class="prop-row-head">
+        <div><p class="dash-li-title">${esc(q.projectName || q.number)}</p><p class="dash-li-meta">${esc([q.unitCode, q.number].filter(Boolean).join(' · '))}</p></div>
+        <div class="prop-side">
+          <span class="prop-monthly">${inr(q.monthlyTotal)}/mo</span>
+          <span class="dash-tag ${PSTATUS[q.status] || ''}">${esc(q.status)}</span>
+          <button type="button" class="btn-ghost btn-sm" data-act="toggle">View</button>
+        </div>
+      </div>
+      <div class="prop-detail" hidden></div>
+    </div>`).join('') : `<p class="dash-empty">No proposals yet. Your advisor will share options here.</p>`;
+}
+
+propsEl.addEventListener('click', async (e) => {
+  const row = e.target.closest('.prop-row'); if (!row) return;
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  const detail = row.querySelector('.prop-detail');
+  if (act === 'toggle') {
+    const btn = e.target.closest('[data-act="toggle"]');
+    if (!detail.hidden) { detail.hidden = true; btn.textContent = 'View'; return; }
+    detail.innerHTML = `<p class="dash-li-meta">Loading…</p>`; detail.hidden = false; btn.textContent = 'Hide';
+    try {
+      const q = await portal.proposal(row.dataset.id);
+      const items = Array.isArray(q.items) ? q.items : [];
+      const canRespond = ['SENT', 'VIEWED'].includes(q.status);
+      detail.innerHTML = `
+        ${items.length ? `<table class="prop-table">${items.map((i) => `<tr><td>${esc(i.label)}${i.detail ? `<span>${esc(i.detail)}</span>` : ''}</td><td>${esc(i.amount != null ? inr(i.amount) : '')}</td></tr>`).join('')}</table>` : ''}
+        <div class="prop-terms">
+          <span>Monthly <b>${inr(q.monthlyTotal)}</b></span><span>Annual <b>${inr(q.annualTotal)}</b></span>
+          <span>Deposit <b>${inr(q.deposit)}</b></span><span>Move-in <b>${inr(q.moveInCost)}</b></span>
+          <span>Term <b>${esc(q.termMonths)}m</b></span>${q.escalationPct ? `<span>Escalation <b>${esc(q.escalationPct)}%</b></span>` : ''}
+        </div>
+        ${q.inclusions?.length ? `<p class="dash-li-meta">Includes: ${esc(q.inclusions.join(', '))}</p>` : ''}
+        ${canRespond ? `<div class="prop-actions"><button type="button" class="btn-primary btn-sm" data-act="accept">Accept</button><button type="button" class="btn-ghost btn-sm" data-act="decline">Decline</button></div>` : ''}`;
+    } catch { detail.innerHTML = `<p class="dash-empty">Could not load.</p>`; }
+    return;
+  }
+  if (act === 'accept' || act === 'decline') {
+    e.target.disabled = true;
+    try {
+      const r = await portal.respondProposal(row.dataset.id, act === 'accept');
+      const tag = row.querySelector('.dash-tag');
+      tag.textContent = r.status; tag.className = `dash-tag ${PSTATUS[r.status] || ''}`;
+      row.querySelector('.prop-actions')?.remove();
+      toast(act === 'accept' ? 'Proposal accepted. Your advisor will proceed.' : 'Proposal declined.');
+    } catch (err) { e.target.disabled = false; toast(err.message || 'Action failed.', true); }
+  }
+});
+
+loadProposals();
+
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/portal', tokenKey: 'bayworks_portal_token' });
