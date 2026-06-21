@@ -2113,8 +2113,10 @@ img { display: block; max-width: 100%; }
 .auth-toast.success { display: block; background: var(--green-light); color: var(--green-darker); border-color: var(--green-border); }
 .auth-toast.info    { display: block; background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
 
-/* Login link in the nav (guest, injected) */
+/* Login dropdown in the nav (guest, injected) — sits left of the hamburger */
+.nav-login { position: relative; display: inline-flex; }
 .nav-login-link {
+  display: inline-flex; align-items: center; gap: 0.3rem;
   font-family: var(--font-head); font-size: 0.85rem; font-weight: 600;
   padding: 0.5rem 1.1rem; border-radius: var(--radius);
   color: var(--green); border: 1.5px solid var(--green-border);
@@ -2123,7 +2125,35 @@ img { display: block; max-width: 100%; }
 .nav-login-link:hover { background: var(--green-light); border-color: var(--green); }
 .nav:not(.scrolled) .nav-login-link { color: #fff; border-color: rgba(255,255,255,0.45); }
 .nav:not(.scrolled) .nav-login-link:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
-@media (max-width: 768px) { .nav-login-link { display: none; } }
+.login-caret { width: 14px; height: 14px; transition: transform var(--fast); }
+.nav-login.open .login-caret { transform: rotate(180deg); }
+
+.login-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); min-width: 240px;
+  background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px rgba(15,23,42,0.16); padding: 0.4rem; z-index: 1100;
+  display: none;
+}
+.nav-login.open .login-menu { display: block; animation: authFade 0.18s var(--ease); }
+.login-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  padding: 0.6rem 0.7rem; border-radius: var(--radius); color: var(--ink);
+}
+a.login-item:hover { background: var(--green-light); }
+.login-item-main { display: flex; flex-direction: column; }
+.login-item-main strong { font-family: var(--font-head); font-size: 0.88rem; font-weight: 600; }
+.login-item-main small { font-size: 0.74rem; color: var(--ink-muted); }
+.login-item.is-soon { opacity: 0.7; cursor: default; }
+.login-soon {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  background: var(--gray-100); color: var(--ink-muted); padding: 0.18rem 0.5rem; border-radius: 100px;
+}
+.login-ext { width: 14px; height: 14px; color: var(--gray-400); flex: 0 0 auto; }
+
+/* Keep the Login dropdown visible to the left of the hamburger on mobile */
+@media (max-width: 860px) {
+  .nav-login-link { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+}
 
 /* Nav account chip (injected on marketing pages) */
 .nav-account { display: inline-flex; align-items: center; gap: 0.5rem; }
