@@ -51,6 +51,8 @@ async function req(path, { method = 'GET', body, auth = false } = {}) {
 
 export const register    = (d) => req('/portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } });
 export const login       = (d) => req('/portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } });
+export const forgotPassword = (email)          => req('/portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
+export const resetPassword  = (token, password) => req('/portal/auth/reset',  { method: 'POST', body: { token, password } });
 export const me          = ()  => req('/portal/me',          { auth: true });
 export const updateMe    = (d) => req('/portal/me',          { method: 'PATCH', body: d, auth: true });
 export const summary     = ()  => req('/portal/summary',     { auth: true });

@@ -14,6 +14,7 @@ export default defineConfig({
         about: resolve(__dirname, 'about.html'),
         admin: resolve(__dirname, 'admin.html'),
         login: resolve(__dirname, 'login.html'),
+        resetPassword: resolve(__dirname, 'reset-password.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
         partnerLogin: resolve(__dirname, 'partner-login.html'),
         partnerDashboard: resolve(__dirname, 'partner-dashboard.html'),

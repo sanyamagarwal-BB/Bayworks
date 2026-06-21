@@ -198,7 +198,16 @@ export async function login(creds) {
   }
 }
 
-export const requestReset  = (email) => store.requestReset(email);
+/** Request a password reset — API-first, falling back to the local demo store offline. */
+export async function requestReset(email) {
+  try {
+    return await portal.forgotPassword(email);
+  } catch (e) {
+    if (e.network) return store.requestReset(email);
+    throw new AuthError(e.message, e.code);
+  }
+}
+export const resetPassword = (token, password) => portal.resetPassword(token, password);
 export const getLockState  = (email) => lockState(normEmail(email));
 
 /** Current session if present and unexpired; otherwise null (auto-cleans expired). */
