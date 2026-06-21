@@ -47,6 +47,7 @@ export async function login(d)    { return save(await req('/partner-portal/auth/
 export const me          = () => req('/partner-portal/me',          { auth: true });
 export const summary     = () => req('/partner-portal/summary',     { auth: true });
 export const leads       = () => req('/partner-portal/leads',       { auth: true });
+export const referLead   = (d) => req('/partner-portal/leads',      { method: 'POST', body: d, auth: true });
 export const commissions = () => req('/partner-portal/commissions', { auth: true });
 
 export const isAuthenticated = () => !!token();

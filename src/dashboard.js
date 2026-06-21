@@ -67,7 +67,7 @@ async function loadPortalData() {
     ]);
     return {
       stats: s.stats,
-      shortlist: sl.items.map((p) => ({ name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '' })),
+      shortlist: sl.items.map((p) => ({ unitId: p.unitId, name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '' })),
       requirements: r.items,
       visits: v.items.map((x) => ({ title: x.title, when: fmtVisit(x.when), meta: x.status })),
     };
@@ -85,12 +85,16 @@ function render(data) {
     </div>`).join('');
 
   $('#dash-shortlist').innerHTML = data.shortlist.length ? data.shortlist.map((p) => `
-    <article class="dash-prop">
+    <article class="dash-prop"${p.unitId ? ` data-unit="${esc(p.unitId)}"` : ''}>
       <div class="dash-prop-img"${p.img ? ` style="background-image:url('${esc(p.img)}')"` : ''}></div>
       <div class="dash-prop-body">
         <h3>${esc(p.name)}</h3>
         <p class="dash-prop-meta">${esc([p.city, p.meta].filter(Boolean).join(' · '))}</p>
         <p class="dash-prop-rate">${esc(p.rate)}</p>
+        ${p.unitId && isApiSession() ? `<div class="dash-prop-book">
+          <input type="datetime-local" class="book-when" aria-label="Visit date and time" />
+          <button type="button" class="btn-primary btn-sm" data-act="book">Book visit</button>
+        </div>` : ''}
       </div>
     </article>`).join('') : `<p class="dash-empty">No shortlisted spaces yet. <a href="/properties.html" class="auth-link">Browse properties</a></p>`;
 
@@ -111,6 +115,34 @@ function render(data) {
       </div>
       <span class="dash-tag dash-tag-green">${esc(v.when)}</span>
     </li>`).join('') : `<li class="dash-empty">No visits scheduled yet.</li>`;
+}
+
+/* ── book a visit from a shortlisted unit ───────────────────── */
+$('#dash-shortlist').addEventListener('click', async (e) => {
+  if (e.target.closest('[data-act="book"]') === null) return;
+  const card = e.target.closest('.dash-prop[data-unit]');
+  if (!card) return;
+  const when = card.querySelector('.book-when').value;
+  if (!when) { toast('Pick a date and time first.', true); return; }
+  const btn = e.target.closest('[data-act="book"]');
+  btn.disabled = true; btn.textContent = 'Booking…';
+  try {
+    await portal.bookVisit({ unitId: card.dataset.unit, when: new Date(when).toISOString() });
+    toast('Site visit requested. Your advisor will confirm.');
+    render(await loadPortalData()); // refresh visits + stats
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Book visit';
+    toast(err.message || 'Could not book the visit.', true);
+  }
+});
+
+let toastTimer;
+function toast(msg, isErr = false) {
+  let t = document.getElementById('c-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'c-toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2000;padding:.7rem 1.1rem;border-radius:8px;font-family:var(--font-head);font-size:.85rem;font-weight:600;box-shadow:0 8px 24px rgba(15,23,42,.18);background:${isErr ? '#FEF2F2' : 'var(--green-light)'};color:${isErr ? '#B91C1C' : 'var(--green-darker)'};border:1px solid ${isErr ? '#FECACA' : 'var(--green-border)'}`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.remove(), 3500);
 }
 
 loadPortalData().then(render);

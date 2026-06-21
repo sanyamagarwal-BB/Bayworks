@@ -58,6 +58,7 @@ export const requirement = ()  => req('/portal/requirement', { auth: true });
 export const shortlist   = ()  => req('/portal/shortlist',   { auth: true });
 export const visits      = ()  => req('/portal/visits',      { auth: true });
 
+export const bookVisit       = (data)   => req('/portal/visits',    { method: 'POST', body: data, auth: true });
 export const addShortlist    = (unitId) => req('/portal/shortlist', { method: 'POST', body: { unitId }, auth: true });
 export const removeShortlist = (unitId) => req(`/portal/shortlist/${encodeURIComponent(unitId)}`, { method: 'DELETE', auth: true });
 

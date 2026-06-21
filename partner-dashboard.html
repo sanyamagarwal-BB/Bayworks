@@ -35,7 +35,26 @@
 
     <div class="dash-grid">
       <section class="dash-card dash-card-wide">
-        <div class="dash-card-head"><h2>Your referred leads</h2></div>
+        <div class="dash-card-head">
+          <h2>Your referred leads</h2>
+          <button type="button" id="refer-toggle" class="btn-primary btn-sm">+ Refer a lead</button>
+        </div>
+        <form id="refer-form" class="refer-form" hidden>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="rl-name">Name</label><input id="rl-name" type="text" placeholder="Client name" required /></div>
+            <div class="form-row"><label for="rl-company">City</label><input id="rl-city" type="text" placeholder="City" /></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="rl-email">Email</label><input id="rl-email" type="email" placeholder="client@company.com" /></div>
+            <div class="form-row"><label for="rl-phone">Phone</label><input id="rl-phone" type="tel" placeholder="+91 90000 00000" /></div>
+          </div>
+          <div class="form-row"><label for="rl-budget">Budget (optional)</label><input id="rl-budget" type="text" placeholder="e.g. 40 seats, ₹8L/mo" /></div>
+          <small class="field-err" id="rl-err"></small>
+          <div style="display:flex;gap:.6rem">
+            <button type="submit" class="btn-primary btn-sm" id="rl-submit">Submit referral</button>
+            <button type="button" class="btn-ghost btn-sm" id="rl-cancel">Cancel</button>
+          </div>
+        </form>
         <ul class="dash-list" id="dash-leads"></ul>
       </section>
       <section class="dash-card">
