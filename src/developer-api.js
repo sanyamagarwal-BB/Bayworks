@@ -41,6 +41,7 @@ function save(res) {
 
 export async function register(d) { return save(await req('/developer-portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
 export async function login(d)    { return save(await req('/developer-portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+export const forgotPassword = (email) => req('/developer-portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
 
 export const me       = () => req('/developer-portal/me',       { auth: true });
 export const summary  = () => req('/developer-portal/summary',  { auth: true });

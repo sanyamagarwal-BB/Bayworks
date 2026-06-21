@@ -43,6 +43,7 @@ function save(res) {
 
 export async function register(d) { return save(await req('/partner-portal/auth/register', { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
 export async function login(d)    { return save(await req('/partner-portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } })); }
+export const forgotPassword = (email) => req('/partner-portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
 
 export const me          = () => req('/partner-portal/me',          { auth: true });
 export const summary     = () => req('/partner-portal/summary',     { auth: true });

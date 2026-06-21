@@ -69,3 +69,13 @@ views.signup.addEventListener('submit', async (e) => {
 });
 
 function safeNext(v) { if (!v) return null; try { const d = decodeURIComponent(v); return d.startsWith('/') && !d.startsWith('//') ? d : null; } catch { return null; } }
+
+/* ── forgot password ────────────────────────────────────────── */
+$('#si-forgot').addEventListener('click', async () => {
+  const email = $('#si-email').value.trim();
+  if (!emailOk(email)) { setErr('si-email', 'Enter your email above first.'); $('#si-email').focus(); return; }
+  try {
+    await import('./developer-api.js').then(m => m.forgotPassword(email));
+    showToast('If that email is registered, a reset link is on its way.', 'success');
+  } catch (err) { showToast(err.message || 'Could not start password reset.'); }
+});
