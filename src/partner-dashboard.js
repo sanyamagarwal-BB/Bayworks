@@ -95,3 +95,6 @@ function toast(msg, isErr = false) {
 }
 
 load();
+
+import { initBell } from './notify-bell.js';
+initBell({ basePath: '/partner-portal', tokenKey: 'bayworks_partner_token' });

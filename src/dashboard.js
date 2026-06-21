@@ -146,3 +146,6 @@ function toast(msg, isErr = false) {
 }
 
 loadPortalData().then(render);
+
+import { initBell } from './notify-bell.js';
+initBell({ basePath: '/portal', tokenKey: 'bayworks_portal_token' });

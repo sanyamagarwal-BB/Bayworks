@@ -113,3 +113,6 @@ function toast(msg, isErr = false) {
 }
 
 load();
+
+import { initBell } from './notify-bell.js';
+initBell({ basePath: '/developer-portal', tokenKey: 'bayworks_developer_token' });

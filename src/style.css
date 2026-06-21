@@ -2189,6 +2189,21 @@ a.login-item:hover { background: var(--green-light); }
 }
 .dash-top-nav a:hover { color: var(--green); }
 .dash-account { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+
+/* Notification bell */
+.nbell { position: relative; }
+.nbell-btn { position: relative; display: inline-flex; width: 38px; height: 38px; align-items: center; justify-content: center; border-radius: 50%; color: var(--ink-2); transition: background var(--fast), color var(--fast); }
+.nbell-btn:hover { background: var(--gray-100); color: var(--green); }
+.nbell-btn svg { width: 20px; height: 20px; }
+.nbell-badge { position: absolute; top: 3px; right: 3px; min-width: 16px; height: 16px; padding: 0 4px; display: inline-flex; align-items: center; justify-content: center; background: #DC2626; color: #fff; font-size: 0.62rem; font-weight: 700; border-radius: 100px; }
+.nbell-menu { position: absolute; right: 0; top: calc(100% + 8px); width: 320px; max-height: 420px; overflow-y: auto; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); box-shadow: 0 12px 32px rgba(15,23,42,0.16); z-index: 1200; }
+.nbell-head { font-family: var(--font-head); font-weight: 700; font-size: 0.9rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--gray-100); }
+.nbell-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); }
+.nbell-item.is-unread { background: var(--green-light); }
+.nbell-title { font-family: var(--font-head); font-weight: 600; font-size: 0.85rem; color: var(--ink); }
+.nbell-body { font-size: 0.8rem; color: var(--ink-muted); margin-top: 0.15rem; }
+.nbell-time { font-size: 0.7rem; color: var(--gray-400); margin-top: 0.2rem; }
+.nbell-empty { padding: 1.2rem 1rem; text-align: center; color: var(--ink-muted); font-size: 0.85rem; }
 .dash-avatar {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; border-radius: 50%;
