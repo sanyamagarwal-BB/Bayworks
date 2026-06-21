@@ -2247,6 +2247,9 @@ a.login-item:hover { background: var(--green-light); }
   background: var(--gray-100); color: var(--ink-2);
 }
 .dash-tag-green { background: var(--green-light); color: var(--green-dark); }
+.unit-controls { display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+.unit-rate { font-family: var(--font-head); font-weight: 700; color: var(--green-dark); font-size: 0.9rem; }
+.btn-sm { padding: 0.4rem 0.8rem !important; font-size: 0.78rem !important; }
 .dash-empty { color: var(--ink-muted); font-size: 0.88rem; padding: 0.5rem 0; }
 
 /* Profile */
