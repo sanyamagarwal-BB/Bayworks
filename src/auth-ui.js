@@ -3,7 +3,7 @@
  * password meter/toggle, submit handling, toasts, and post-login redirect.
  */
 import {
-  register, login, requestReset, isAuthenticated,
+  register, login, verify2fa, requestReset, isAuthenticated,
   validators, passwordStrength,
 } from './auth.js';
 
@@ -20,7 +20,9 @@ const views = {
   signin: $('#form-signin'),
   signup: $('#form-signup'),
   forgot: $('#form-forgot'),
+  twofa: $('#form-2fa'),
 };
+let pending2fa = null; // { ticket, remember }
 const indicator = $('.auth-tab-indicator');
 
 function showView(name) {
@@ -113,11 +115,35 @@ views.signin.addEventListener('submit', async (e) => {
   const btn = $('#si-submit');
   setBusy(btn, true);
   try {
-    await login({ email, password: pass, remember: $('#si-remember').checked });
+    const remember = $('#si-remember').checked;
+    const res = await login({ email, password: pass, remember });
+    if (res.twoFactorRequired) {
+      pending2fa = { ticket: res.ticket, remember };
+      showView('twofa');
+      return;
+    }
     showToast('Signed in. Redirecting…', 'success');
     setTimeout(() => location.replace(nextUrl), 500);
   } catch (err) {
     showToast(err.message || 'Sign in failed.');
+  } finally { setBusy(btn, false); }
+});
+
+/* ── 2FA verify ─────────────────────────────────────────────── */
+views.twofa.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearErrs(views.twofa);
+  const code = $('#tf-code').value.trim();
+  if (!/^\d{6}$/.test(code)) return setErr('tf-code', 'Enter the 6-digit code.');
+  if (!pending2fa) { showView('signin'); return; }
+  const btn = $('#tf-submit');
+  setBusy(btn, true);
+  try {
+    await verify2fa(pending2fa.ticket, code, pending2fa.remember);
+    showToast('Signed in. Redirecting…', 'success');
+    setTimeout(() => location.replace(nextUrl), 500);
+  } catch (err) {
+    setErr('tf-code', err.message || 'Invalid code.');
   } finally { setBusy(btn, false); }
 });
 

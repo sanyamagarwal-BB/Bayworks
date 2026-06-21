@@ -186,15 +186,28 @@ export async function register(data) {
   }
 }
 
-/** Login API-first, falling back to the local demo store if the CRM is down. */
+/** Login API-first. Returns { user } on success, or { twoFactorRequired, ticket }
+ *  when the account has 2FA enabled. Falls back to the local demo store offline. */
 export async function login(creds) {
   try {
     const res = await portal.login({ email: creds.email, password: creds.password });
+    if (res.twoFactorRequired) return { twoFactorRequired: true, ticket: res.ticket };
     saveApiSession(res, !!creds.remember);
-    return res.user;
+    return { user: res.user };
   } catch (e) {
-    if (e.network) return store.login(creds); // offline → local demo (lockout etc.)
+    if (e.network) return { user: await store.login(creds) }; // offline → local demo
     throw new AuthError(e.message, e.status === 401 ? 'BAD_CREDENTIALS' : e.code);
+  }
+}
+
+/** Complete a 2FA login: exchange ticket + code for a session. */
+export async function verify2fa(ticket, code, remember) {
+  try {
+    const res = await portal.verify2fa(ticket, code);
+    saveApiSession(res, !!remember);
+    return { user: res.user };
+  } catch (e) {
+    throw new AuthError(e.message, e.code);
   }
 }
 

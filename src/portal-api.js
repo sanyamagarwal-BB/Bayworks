@@ -53,6 +53,11 @@ export const register    = (d) => req('/portal/auth/register', { method: 'POST',
 export const login       = (d) => req('/portal/auth/login',    { method: 'POST', body: { ...d, token: CAPTURE_TOKEN } });
 export const forgotPassword = (email)          => req('/portal/auth/forgot', { method: 'POST', body: { email, token: CAPTURE_TOKEN } });
 export const resetPassword  = (token, password) => req('/portal/auth/reset',  { method: 'POST', body: { token, password } });
+export const verify2fa      = (ticket, code)    => req('/portal/auth/2fa',    { method: 'POST', body: { ticket, code } });
+export const twoFaStatus    = ()      => req('/portal/2fa/status',  { auth: true });
+export const twoFaSetup     = ()      => req('/portal/2fa/setup',   { method: 'POST', auth: true });
+export const twoFaEnable    = (code)  => req('/portal/2fa/enable',  { method: 'POST', body: { code }, auth: true });
+export const twoFaDisable   = (code)  => req('/portal/2fa/disable', { method: 'POST', body: { code }, auth: true });
 export const me          = ()  => req('/portal/me',          { auth: true });
 export const updateMe    = (d) => req('/portal/me',          { method: 'PATCH', body: d, auth: true });
 export const summary     = ()  => req('/portal/summary',     { auth: true });

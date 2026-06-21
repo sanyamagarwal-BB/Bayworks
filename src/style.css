@@ -2219,6 +2219,8 @@ a.login-item:hover { background: var(--green-light); }
 .prop-terms { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.8rem; color: var(--ink-muted); }
 .prop-terms b { color: var(--ink); font-weight: 600; }
 .prop-actions { display: flex; gap: 0.6rem; margin-top: 0.9rem; }
+.sec-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+#dash-2fa code { font-size: 0.78rem; background: var(--gray-100); padding: 0.1rem 0.35rem; border-radius: 4px; }
 .dash-avatar {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; border-radius: 50%;
