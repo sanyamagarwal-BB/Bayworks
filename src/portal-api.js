@@ -55,6 +55,8 @@ export const me          = ()  => req('/portal/me',          { auth: true });
 export const updateMe    = (d) => req('/portal/me',          { method: 'PATCH', body: d, auth: true });
 export const summary     = ()  => req('/portal/summary',     { auth: true });
 export const requirement = ()  => req('/portal/requirement', { auth: true });
+export const requirementForm = () => req('/portal/requirement-form', { auth: true });
+export const saveRequirement = (d) => req('/portal/requirement', { method: 'PUT', body: d, auth: true });
 export const shortlist   = ()  => req('/portal/shortlist',   { auth: true });
 export const visits      = ()  => req('/portal/visits',      { auth: true });
 

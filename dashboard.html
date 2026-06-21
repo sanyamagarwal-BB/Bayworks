@@ -58,7 +58,33 @@
 
       <!-- Requirements -->
       <section class="dash-card">
-        <div class="dash-card-head"><h2>Your requirements</h2></div>
+        <div class="dash-card-head">
+          <h2>Your requirements</h2>
+          <button type="button" id="req-toggle" class="btn-ghost btn-sm">Edit brief</button>
+        </div>
+        <form id="req-form" class="refer-form" hidden>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="rq-seats">Seats needed</label><input id="rq-seats" type="number" min="0" placeholder="e.g. 40" /></div>
+            <div class="form-row"><label for="rq-type">Space type</label>
+              <select id="rq-type"><option value="">Select</option><option>Managed Office</option><option>Coworking</option><option>Bare Shell</option><option>Built-to-suit</option></select>
+            </div>
+          </div>
+          <div class="form-row"><label for="rq-cities">Preferred cities</label><input id="rq-cities" type="text" placeholder="Bengaluru, Mumbai" /></div>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="rq-bmin">Budget min (₹/mo)</label><input id="rq-bmin" type="number" min="0" placeholder="500000" /></div>
+            <div class="form-row"><label for="rq-bmax">Budget max (₹/mo)</label><input id="rq-bmax" type="number" min="0" placeholder="900000" /></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="rq-movein">Expected move-in</label><input id="rq-movein" type="text" placeholder="e.g. Aug 2026" /></div>
+            <div class="form-row"><label for="rq-urgency">Urgency</label>
+              <select id="rq-urgency"><option value="">Select</option><option>Immediate</option><option>Within 30 Days</option><option>1-3 months</option><option>3-6 months</option><option>Exploring</option></select>
+            </div>
+          </div>
+          <div style="display:flex;gap:.6rem">
+            <button type="submit" class="btn-primary btn-sm" id="rq-submit">Save brief</button>
+            <button type="button" class="btn-ghost btn-sm" id="rq-cancel">Cancel</button>
+          </div>
+        </form>
         <ul class="dash-list" id="dash-reqs"></ul>
       </section>
 

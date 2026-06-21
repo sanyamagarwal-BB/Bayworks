@@ -208,5 +208,39 @@ propsEl.addEventListener('click', async (e) => {
 
 loadProposals();
 
+/* ── requirement brief wizard ───────────────────────────────── */
+const reqForm = $('#req-form');
+const rqToggle = $('#req-toggle');
+if (rqToggle && isApiSession()) {
+  rqToggle.addEventListener('click', async () => {
+    if (!reqForm.hidden) { reqForm.hidden = true; return; }
+    try {
+      const f = await portal.requirementForm();
+      $('#rq-seats').value = f.seats ?? ''; $('#rq-type').value = f.requirementType || '';
+      $('#rq-cities').value = f.cities || ''; $('#rq-bmin').value = f.budgetMin ?? '';
+      $('#rq-bmax').value = f.budgetMax ?? ''; $('#rq-movein').value = f.moveIn || '';
+      $('#rq-urgency').value = f.urgency || '';
+    } catch { /* start blank */ }
+    reqForm.hidden = false; $('#rq-seats').focus();
+  });
+  $('#rq-cancel').addEventListener('click', () => { reqForm.hidden = true; });
+  reqForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('#rq-submit'); btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      await portal.saveRequirement({
+        seats: $('#rq-seats').value, requirementType: $('#rq-type').value, cities: $('#rq-cities').value,
+        budgetMin: $('#rq-bmin').value, budgetMax: $('#rq-bmax').value, moveIn: $('#rq-movein').value, urgency: $('#rq-urgency').value,
+      });
+      reqForm.hidden = true;
+      toast('Requirement brief saved.');
+      render(await loadPortalData()); // refresh requirement summary + stat
+    } catch (err) { toast(err.message || 'Could not save brief.', true); }
+    finally { btn.disabled = false; btn.textContent = 'Save brief'; }
+  });
+} else if (rqToggle) {
+  rqToggle.style.display = 'none'; // editing requires a live session
+}
+
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/portal', tokenKey: 'bayworks_portal_token' });
