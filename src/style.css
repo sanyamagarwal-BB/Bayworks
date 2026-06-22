@@ -2221,6 +2221,8 @@ a.login-item:hover { background: var(--green-light); }
 .prop-actions { display: flex; gap: 0.6rem; margin-top: 0.9rem; }
 .sec-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 #dash-2fa code { font-size: 0.78rem; background: var(--gray-100); padding: 0.1rem 0.35rem; border-radius: 4px; }
+.backup-codes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.7rem; }
+.backup-codes code { font-size: 0.85rem; background: var(--gray-100); padding: 0.35rem 0.5rem; border-radius: 6px; text-align: center; letter-spacing: 0.05em; }
 .dash-avatar {
   display: inline-flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; border-radius: 50%;

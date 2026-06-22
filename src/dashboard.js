@@ -301,6 +301,18 @@ function renderSec(enabled) {
     : `<div class="sec-row"><div><p class="dash-li-title">Two-factor authentication</p><p class="dash-li-meta">Add an authenticator app for extra security</p></div><span class="dash-tag">OFF</span></div>
        <button type="button" class="btn-primary btn-sm" data-act="enable" style="margin-top:.8rem">Enable 2FA</button>`;
 }
+function showBackupCodes(codes) {
+  secEl.innerHTML = `
+    <p class="dash-li-title">Save your backup codes</p>
+    <p class="dash-li-meta">Each can be used once if you lose your authenticator. Store them somewhere safe.</p>
+    <div class="backup-codes">${codes.map((c) => `<code>${esc(c)}</code>`).join('')}</div>
+    <div style="display:flex;gap:.6rem;margin-top:.8rem">
+      <button type="button" class="btn-ghost btn-sm" id="bc-copy">Copy</button>
+      <button type="button" class="btn-primary btn-sm" data-act="done-codes">I've saved them</button>
+    </div>`;
+  const copyBtn = document.getElementById('bc-copy');
+  if (copyBtn) copyBtn.addEventListener('click', () => { navigator.clipboard?.writeText(codes.join('\n')); toast('Backup codes copied.'); });
+}
 async function loadSecurity() {
   if (!isApiSession() || !secCard) return;
   secCard.hidden = false;
@@ -324,8 +336,13 @@ secEl?.addEventListener('click', async (e) => {
         </div><p class="field-err" id="tf-en-err"></p>`;
     } catch { secEl.innerHTML = `<p class="dash-empty">Could not start setup.</p>`; }
   } else if (act === 'confirm-enable') {
-    try { await portal.twoFaEnable($('#tf-en-code').value.trim()); toast('Two-factor authentication enabled.'); renderSec(true); }
-    catch (err) { $('#tf-en-err').textContent = err.message || 'Invalid code.'; }
+    try {
+      const res = await portal.twoFaEnable($('#tf-en-code').value.trim());
+      toast('Two-factor authentication enabled.');
+      showBackupCodes(res.backupCodes || []);
+    } catch (err) { $('#tf-en-err').textContent = err.message || 'Invalid code.'; }
+  } else if (act === 'done-codes') {
+    renderSec(true);
   } else if (act === 'disable') {
     secEl.innerHTML = `<p class="dash-li-meta">Enter a current code to turn off 2FA.</p>
       <div style="display:flex;gap:.5rem;margin-top:.6rem">

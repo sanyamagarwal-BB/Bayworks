@@ -134,7 +134,7 @@ views.twofa.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearErrs(views.twofa);
   const code = $('#tf-code').value.trim();
-  if (!/^\d{6}$/.test(code)) return setErr('tf-code', 'Enter the 6-digit code.');
+  if (!/^[a-z0-9]{6,10}$/i.test(code)) return setErr('tf-code', 'Enter your 6-digit code or a backup code.');
   if (!pending2fa) { showView('signin'); return; }
   const btn = $('#tf-submit');
   setBusy(btn, true);
