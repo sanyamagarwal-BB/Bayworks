@@ -59,6 +59,12 @@ export const summary     = () => req('/partner-portal/summary',     { auth: true
 export const leads       = () => req('/partner-portal/leads',       { auth: true });
 export const referLead   = (d) => req('/partner-portal/leads',      { method: 'POST', body: d, auth: true });
 export const commissions = () => req('/partner-portal/commissions', { auth: true });
+export async function commissionStatement() {
+  const res = await fetch(BASE + '/partner-portal/commissions/statement', { headers: { Authorization: `Bearer ${token()}` } });
+  if (res.status === 401) { logout(); throw new ApiError('Session expired', { status: 401 }); }
+  if (!res.ok) throw new ApiError('Could not download statement', { status: res.status });
+  return res.text();
+}
 
 export const isAuthenticated = () => !!token();
 export function cachedUser() { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }

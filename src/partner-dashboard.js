@@ -99,6 +99,21 @@ load();
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/partner-portal', tokenKey: 'bayworks_partner_token' });
 
+/* ── download commission statement (CSV) ────────────────────── */
+document.getElementById('comm-download')?.addEventListener('click', async () => {
+  const btn = document.getElementById('comm-download');
+  btn.disabled = true; const label = btn.textContent; btn.textContent = 'Preparing…';
+  try {
+    const csv = await partner.commissionStatement();
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = 'bayworks-commissions.csv'; document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Statement downloaded.');
+  } catch (err) { toast(err.message || 'Could not download statement.', true); }
+  finally { btn.disabled = false; btn.textContent = label; }
+});
+
 /* ── security / 2FA ─────────────────────────────────────────── */
 (function initSecurity() {
   const NS = partner;
