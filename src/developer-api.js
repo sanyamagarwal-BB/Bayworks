@@ -57,6 +57,8 @@ export const summary  = () => req('/developer-portal/summary',  { auth: true });
 export const projects = () => req('/developer-portal/projects', { auth: true });
 export const units    = () => req('/developer-portal/units',    { auth: true });
 export const demand   = () => req('/developer-portal/demand',   { auth: true });
+export const visits   = () => req('/developer-portal/visits',   { auth: true });
+export const confirmVisit = (id) => req(`/developer-portal/visits/${encodeURIComponent(id)}/confirm`, { method: 'POST', auth: true });
 export const updateUnit = (unitId, patch) => req(`/developer-portal/units/${encodeURIComponent(unitId)}`, { method: 'PATCH', body: patch, auth: true });
 
 export const isAuthenticated = () => !!token();

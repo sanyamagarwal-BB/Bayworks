@@ -114,6 +114,29 @@ function toast(msg, isErr = false) {
 
 load();
 
+/* ── site visit requests (confirm) ──────────────────────────── */
+const visitsEl = document.getElementById('dash-visits');
+const fmtDT = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); };
+async function loadVisits() {
+  if (!visitsEl) return;
+  let items = [];
+  try { items = (await dev.visits()).items; } catch { visitsEl.innerHTML = `<li class="dash-empty">Could not load visits.</li>`; return; }
+  visitsEl.innerHTML = items.length ? items.map((v) => `
+    <li class="dash-li" data-id="${esc(v.id)}">
+      <div><p class="dash-li-title">${esc(v.title)}</p><p class="dash-li-meta">${esc(fmtDT(v.when))} · ${esc(v.status)}</p></div>
+      ${v.confirmed ? `<span class="dash-tag dash-tag-green">Confirmed</span>` : `<button type="button" class="btn-primary btn-sm" data-act="confirm">Confirm</button>`}
+    </li>`).join('') : `<li class="dash-empty">No site visit requests yet.</li>`;
+}
+visitsEl?.addEventListener('click', async (e) => {
+  const li = e.target.closest('.dash-li[data-id]'); if (!li) return;
+  if (e.target.closest('[data-act="confirm"]')) {
+    const btn = e.target; btn.disabled = true; btn.textContent = 'Confirming…';
+    try { await dev.confirmVisit(li.dataset.id); toast('Visit confirmed — client notified.'); loadVisits(); }
+    catch (err) { btn.disabled = false; btn.textContent = 'Confirm'; toast(err.message || 'Could not confirm.', true); }
+  }
+});
+loadVisits();
+
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/developer-portal', tokenKey: 'bayworks_developer_token' });
 

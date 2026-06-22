@@ -69,7 +69,7 @@ async function loadPortalData() {
       stats: s.stats,
       shortlist: sl.items.map((p) => ({ unitId: p.unitId, name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '' })),
       requirements: r.items,
-      visits: v.items.map((x) => ({ title: x.title, when: fmtVisit(x.when), meta: x.status })),
+      visits: v.items.map((x) => ({ title: x.title, when: fmtVisit(x.when), meta: x.confirmed ? 'Confirmed' : x.status })),
     };
   } catch {
     return MOCK; // CRM down or session invalid → never break the page
