@@ -154,3 +154,32 @@ document.getElementById('comm-download')?.addEventListener('click', async () => 
   card.hidden = false;
   NS.twoFaStatus().then((s) => render(s.enabled)).catch(() => { el.innerHTML = `<p class="dash-empty">Could not load security settings.</p>`; });
 })();
+
+/* ── documents vault ────────────────────────────────────────── */
+(function initDocs() {
+  const NS = partner;
+  const el = document.getElementById('dash-documents');
+  const fileInput = document.getElementById('doc-file');
+  if (!el) return;
+  const fmtB = (n) => !n ? '' : n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
+  const fmtDd = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); };
+  async function load() {
+    let items = [];
+    try { items = (await NS.documents()).items; } catch { el.innerHTML = `<li class="dash-empty">Could not load documents.</li>`; return; }
+    el.innerHTML = items.length ? items.map((d) => `<li class="dash-li" data-id="${esc(d.id)}"><div><p class="dash-li-title">${esc(d.name)}</p><p class="dash-li-meta">${esc([d.uploadedBy === 'staff' ? 'BayWorks' : 'You', fmtB(d.sizeBytes), fmtDd(d.createdAt)].filter(Boolean).join(' · '))}</p></div><div class="unit-controls"><button type="button" class="btn-ghost btn-sm" data-act="dl">Download</button>${d.uploadedBy !== 'staff' ? `<button type="button" class="btn-ghost btn-sm" data-act="del">Remove</button>` : ''}</div></li>`).join('') : `<li class="dash-empty">No documents yet. Upload KYC, agreements or brochures here.</li>`;
+  }
+  el.addEventListener('click', async (e) => {
+    const li = e.target.closest('.dash-li[data-id]'); if (!li) return;
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (act === 'dl') { try { const d = await NS.documentUrl(li.dataset.id); const a = document.createElement('a'); a.href = d.url; a.download = d.name || 'document'; document.body.appendChild(a); a.click(); a.remove(); } catch (err) { toast(err.message || 'Download failed.', true); } }
+    else if (act === 'del') { try { await NS.deleteDocument(li.dataset.id); toast('Document removed.'); load(); } catch (err) { toast(err.message || 'Could not remove.', true); } }
+  });
+  fileInput?.addEventListener('change', (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    if (f.size > 5 * 1024 * 1024) { toast('File too large (max 5 MB).', true); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = async () => { try { await NS.uploadDocument({ name: f.name, url: r.result, mimeType: f.type }); toast('Document uploaded.'); load(); } catch (err) { toast(err.message || 'Upload failed.', true); } e.target.value = ''; };
+    r.readAsDataURL(f);
+  });
+  load();
+})();

@@ -76,3 +76,8 @@ export function requireAuth(loginUrl = '/partner-login.html') {
   location.replace(`${loginUrl}?next=${encodeURIComponent(location.pathname + location.search)}`);
   return false;
 }
+
+export const documents      = ()    => req('/partner-portal/documents', { auth: true });
+export const documentUrl    = (id)  => req(`/partner-portal/documents/${encodeURIComponent(id)}`, { auth: true });
+export const uploadDocument = (doc) => req('/partner-portal/documents', { method: 'POST', body: doc, auth: true });
+export const deleteDocument = (id)  => req(`/partner-portal/documents/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });

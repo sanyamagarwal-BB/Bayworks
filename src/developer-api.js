@@ -70,3 +70,8 @@ export function requireAuth(loginUrl = '/developer-login.html') {
   location.replace(`${loginUrl}?next=${encodeURIComponent(location.pathname + location.search)}`);
   return false;
 }
+
+export const documents      = ()    => req('/developer-portal/documents', { auth: true });
+export const documentUrl    = (id)  => req(`/developer-portal/documents/${encodeURIComponent(id)}`, { auth: true });
+export const uploadDocument = (doc) => req('/developer-portal/documents', { method: 'POST', body: doc, auth: true });
+export const deleteDocument = (id)  => req(`/developer-portal/documents/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
