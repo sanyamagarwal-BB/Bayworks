@@ -208,6 +208,55 @@ propsEl.addEventListener('click', async (e) => {
 
 loadProposals();
 
+/* ── documents vault ────────────────────────────────────────── */
+const fmtD = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); };
+const fmtBytes = (n) => !n ? '' : n < 1024 ? `${n} B` : n < 1048576 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
+const docsEl = $('#dash-documents');
+
+async function loadDocuments() {
+  if (!docsEl) return;
+  if (!isApiSession()) { docsEl.innerHTML = `<li class="dash-empty">Sign in to manage documents.</li>`; return; }
+  let items = [];
+  try { items = (await portal.documents()).items; } catch { docsEl.innerHTML = `<li class="dash-empty">Could not load documents.</li>`; return; }
+  docsEl.innerHTML = items.length ? items.map((d) => `
+    <li class="dash-li" data-id="${esc(d.id)}">
+      <div><p class="dash-li-title">${esc(d.name)}</p><p class="dash-li-meta">${esc([d.uploadedBy === 'portal' ? 'You' : 'BayWorks', fmtBytes(d.sizeBytes), fmtD(d.createdAt)].filter(Boolean).join(' · '))}</p></div>
+      <div class="unit-controls">
+        <button type="button" class="btn-ghost btn-sm" data-act="dl">Download</button>
+        ${d.uploadedBy === 'portal' ? `<button type="button" class="btn-ghost btn-sm" data-act="del">Remove</button>` : ''}
+      </div>
+    </li>`).join('') : `<li class="dash-empty">No documents yet. Upload LOIs, agreements or KYC here.</li>`;
+}
+
+docsEl?.addEventListener('click', async (e) => {
+  const li = e.target.closest('.dash-li[data-id]'); if (!li) return;
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (act === 'dl') {
+    try {
+      const d = await portal.documentUrl(li.dataset.id);
+      const a = document.createElement('a'); a.href = d.url; a.download = d.name || 'document';
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (err) { toast(err.message || 'Download failed.', true); }
+  } else if (act === 'del') {
+    try { await portal.deleteDocument(li.dataset.id); toast('Document removed.'); loadDocuments(); }
+    catch (err) { toast(err.message || 'Could not remove.', true); }
+  }
+});
+
+$('#doc-file')?.addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { toast('File too large (max 5 MB).', true); e.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try { await portal.uploadDocument({ name: file.name, url: reader.result, mimeType: file.type }); toast('Document uploaded.'); loadDocuments(); }
+    catch (err) { toast(err.message || 'Upload failed.', true); }
+    e.target.value = '';
+  };
+  reader.readAsDataURL(file);
+});
+
+loadDocuments();
+
 /* ── requirement brief wizard ───────────────────────────────── */
 const reqForm = $('#req-form');
 const rqToggle = $('#req-toggle');
