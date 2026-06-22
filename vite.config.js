@@ -15,6 +15,7 @@ export default defineConfig({
         admin: resolve(__dirname, 'admin.html'),
         login: resolve(__dirname, 'login.html'),
         resetPassword: resolve(__dirname, 'reset-password.html'),
+        acceptInvite: resolve(__dirname, 'accept-invite.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
         partnerLogin: resolve(__dirname, 'partner-login.html'),
         partnerDashboard: resolve(__dirname, 'partner-dashboard.html'),

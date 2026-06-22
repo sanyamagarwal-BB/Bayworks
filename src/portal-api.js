@@ -89,3 +89,9 @@ export async function savedUnitIds() {
 }
 
 export const activity = () => req('/portal/activity', { auth: true });
+
+// ── Team / workspace (multi-seat) ──
+export const team          = ()              => req('/portal/team', { auth: true });
+export const inviteMember  = (email, role)   => req('/portal/team/invite', { method: 'POST', body: { email, role }, auth: true });
+export const removeMember  = (accountId)     => req(`/portal/team/${encodeURIComponent(accountId)}`, { method: 'DELETE', auth: true });
+export const acceptInvite  = (token, name, password) => req('/portal/team/accept', { method: 'POST', body: { token, name, password } });

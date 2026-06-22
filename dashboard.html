@@ -68,6 +68,26 @@
         <ul class="dash-list" id="dash-documents"></ul>
       </section>
 
+      <!-- Team / workspace -->
+      <section class="dash-card dash-card-wide" id="dash-team-card" hidden>
+        <div class="dash-card-head">
+          <h2>Team</h2>
+          <span id="team-role-badge" class="dash-tag"></span>
+        </div>
+        <p class="dash-li-meta" style="margin:-.4rem 0 .8rem">Everyone here shares this workspace — the same shortlist, proposals, visits and documents.</p>
+        <ul class="dash-list" id="dash-team-members"></ul>
+        <form id="team-invite-form" class="refer-form" hidden style="margin-top:1rem;border-top:1px solid var(--gray-200);padding-top:1rem">
+          <div class="form-grid-2">
+            <div class="form-row"><label for="ti-email">Invite a colleague</label><input id="ti-email" type="email" placeholder="colleague@company.com" required /></div>
+            <div class="form-row"><label for="ti-role">Access level</label>
+              <select id="ti-role"><option value="MEMBER">Member — can edit</option><option value="VIEWER">Viewer — read-only</option></select>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary btn-sm" id="ti-submit">Send invite</button>
+        </form>
+        <div id="team-pending"></div>
+      </section>
+
       <!-- Requirements -->
       <section class="dash-card">
         <div class="dash-card-head">

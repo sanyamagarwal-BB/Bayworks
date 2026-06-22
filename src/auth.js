@@ -223,6 +223,17 @@ export async function requestReset(email) {
 export const resetPassword = (token, password) => portal.resetPassword(token, password);
 export const getLockState  = (email) => lockState(normEmail(email));
 
+/** Accept a workspace invite: creates the member account and signs them in. */
+export async function acceptInvite(token, name, password) {
+  try {
+    const res = await portal.acceptInvite(token, name, password);
+    saveApiSession(res, true);
+    return res.user;
+  } catch (e) {
+    throw new AuthError(e.message, e.status === 409 ? 'EXISTS' : e.code);
+  }
+}
+
 /** Current session if present and unexpired; otherwise null (auto-cleans expired). */
 export function getSession() {
   const s = read(SESSION_KEY, null);

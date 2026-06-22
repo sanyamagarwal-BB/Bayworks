@@ -399,6 +399,72 @@ secEl?.addEventListener('click', async (e) => {
 });
 loadSecurity();
 
+/* ── team / workspace (multi-seat) ──────────────────────────── */
+const teamCard = $('#dash-team-card');
+const teamMembersEl = $('#dash-team-members');
+const teamInviteForm = $('#team-invite-form');
+const teamPendingEl = $('#team-pending');
+const roleLabel = (r) => ({ OWNER: 'Owner', MEMBER: 'Member', VIEWER: 'Viewer' }[r] || r);
+
+function renderTeam(data) {
+  const isOwner = data.role === 'OWNER';
+  const badge = $('#team-role-badge');
+  badge.textContent = `You: ${roleLabel(data.role)}`;
+  badge.className = `dash-tag ${data.role === 'OWNER' ? 'dash-tag-green' : ''}`;
+
+  teamMembersEl.innerHTML = data.members.map((m) => `
+    <li class="dash-li" data-id="${esc(m.id)}">
+      <div>
+        <p class="dash-li-title">${esc(m.name)}${m.isYou ? ' <span class="dash-li-meta">(you)</span>' : ''}</p>
+        <p class="dash-li-meta">${esc(m.email)}</p>
+      </div>
+      <div class="unit-controls">
+        <span class="dash-tag ${m.workspaceRole === 'OWNER' ? 'dash-tag-green' : ''}">${esc(roleLabel(m.workspaceRole))}</span>
+        ${isOwner && !m.isYou ? `<button type="button" class="btn-ghost btn-sm" data-act="remove-member">Remove</button>` : ''}
+      </div>
+    </li>`).join('');
+
+  teamInviteForm.hidden = !isOwner;
+  teamPendingEl.innerHTML = (isOwner && data.pending.length)
+    ? `<p class="dash-li-meta" style="margin-top:1rem">Pending invites</p><ul class="dash-list">${data.pending.map((p) => `
+        <li class="dash-li"><div><p class="dash-li-title">${esc(p.email)}</p><p class="dash-li-meta">Invited as ${esc(roleLabel(p.role))} · expires ${fmtD(p.expiresAt)}</p></div><span class="dash-tag">Pending</span></li>`).join('')}</ul>`
+    : '';
+}
+
+async function loadTeam() {
+  if (!isApiSession() || !teamCard) return;
+  try {
+    const data = await portal.team();
+    teamCard.hidden = false;
+    // Gate write affordances elsewhere on the page for read-only viewers.
+    document.body.classList.toggle('role-viewer', data.role === 'VIEWER');
+    document.body.classList.toggle('role-member', data.role === 'MEMBER');
+    renderTeam(data);
+  } catch { /* leave team card hidden on failure */ }
+}
+
+teamInviteForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#ti-submit'); btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const r = await portal.inviteMember($('#ti-email').value.trim(), $('#ti-role').value);
+    $('#ti-email').value = '';
+    toast(`Invite sent to ${r.email}.`);
+    loadTeam();
+  } catch (err) { toast(err.message || 'Could not send invite.', true); }
+  finally { btn.disabled = false; btn.textContent = 'Send invite'; }
+});
+
+teamMembersEl?.addEventListener('click', async (e) => {
+  if (!e.target.closest('[data-act="remove-member"]')) return;
+  const li = e.target.closest('.dash-li[data-id]'); if (!li) return;
+  if (!confirm('Remove this person from your workspace? They will lose access immediately.')) return;
+  try { await portal.removeMember(li.dataset.id); toast('Member removed.'); loadTeam(); }
+  catch (err) { toast(err.message || 'Could not remove member.', true); }
+});
+
+loadTeam();
+
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/portal', tokenKey: 'bayworks_portal_token' });
 

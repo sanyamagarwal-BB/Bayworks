@@ -2311,3 +2311,13 @@ a.login-item:hover { background: var(--green-light); }
   .dash-account-name { display: none; }
 }
 
+/* Read-only (VIEWER) workspace seats: hide every write affordance.
+   The API enforces this too — this just keeps the UI honest. */
+body.role-viewer #prof-edit,
+body.role-viewer #req-toggle,
+body.role-viewer label:has(#doc-file),
+body.role-viewer .dash-prop-book,
+body.role-viewer [data-act="accept"],
+body.role-viewer [data-act="decline"],
+body.role-viewer [data-act="del"] { display: none !important; }
+
