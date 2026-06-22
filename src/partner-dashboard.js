@@ -125,6 +125,10 @@ document.getElementById('comm-download')?.addEventListener('click', async () => 
       ? `<div class="sec-row"><div><p class="dash-li-title">Two-factor authentication</p><p class="dash-li-meta">Enabled — a code is required at sign-in</p></div><span class="dash-tag dash-tag-green">ON</span></div><button type="button" class="btn-ghost btn-sm" data-act="disable" style="margin-top:.8rem">Disable 2FA</button>`
       : `<div class="sec-row"><div><p class="dash-li-title">Two-factor authentication</p><p class="dash-li-meta">Add an authenticator app for extra security</p></div><span class="dash-tag">OFF</span></div><button type="button" class="btn-primary btn-sm" data-act="enable" style="margin-top:.8rem">Enable 2FA</button>`;
   };
+  const showBackup = (codes) => {
+    el.innerHTML = `<p class="dash-li-title">Save your backup codes</p><p class="dash-li-meta">Each can be used once if you lose your authenticator.</p><div class="backup-codes">${codes.map((c) => `<code>${esc(c)}</code>`).join('')}</div><div style="display:flex;gap:.6rem;margin-top:.8rem"><button type="button" class="btn-ghost btn-sm" id="bc-copy">Copy</button><button type="button" class="btn-primary btn-sm" data-act="done-codes">I've saved them</button></div>`;
+    const cp = document.getElementById('bc-copy'); if (cp) cp.addEventListener('click', () => { navigator.clipboard?.writeText(codes.join('\n')); toast('Backup codes copied.'); });
+  };
   el.addEventListener('click', async (e) => {
     const act = e.target.closest('[data-act]')?.dataset.act; if (!act) return;
     if (act === 'enable') {
@@ -136,8 +140,10 @@ document.getElementById('comm-download')?.addEventListener('click', async () => 
           <div style="display:flex;gap:.5rem;margin-top:.6rem"><input id="tf-en-code" class="prop-filter" inputmode="numeric" maxlength="6" placeholder="123456" style="width:130px" /><button type="button" class="btn-primary btn-sm" data-act="confirm-enable">Verify &amp; enable</button></div><p class="field-err" id="tf-en-err"></p>`;
       } catch { el.innerHTML = `<p class="dash-empty">Could not start setup.</p>`; }
     } else if (act === 'confirm-enable') {
-      try { await NS.twoFaEnable(document.getElementById('tf-en-code').value.trim()); toast('Two-factor authentication enabled.'); render(true); }
+      try { const res = await NS.twoFaEnable(document.getElementById('tf-en-code').value.trim()); toast('Two-factor authentication enabled.'); showBackup(res.backupCodes || []); }
       catch (err) { document.getElementById('tf-en-err').textContent = err.message || 'Invalid code.'; }
+    } else if (act === 'done-codes') {
+      render(true);
     } else if (act === 'disable') {
       el.innerHTML = `<p class="dash-li-meta">Enter a current code to turn off 2FA.</p><div style="display:flex;gap:.5rem;margin-top:.6rem"><input id="tf-dis-code" class="prop-filter" inputmode="numeric" maxlength="6" placeholder="123456" style="width:130px" /><button type="button" class="btn-ghost btn-sm" data-act="confirm-disable">Disable</button></div><p class="field-err" id="tf-dis-err"></p>`;
     } else if (act === 'confirm-disable') {

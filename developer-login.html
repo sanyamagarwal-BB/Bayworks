@@ -101,10 +101,10 @@
       </form>
 
       <form class="auth-form" id="form-2fa" novalidate>
-        <header class="auth-form-head"><h2>Two-factor authentication</h2><p>Enter the 6-digit code from your authenticator app.</p></header>
+        <header class="auth-form-head"><h2>Two-factor authentication</h2><p>Enter the 6-digit code from your authenticator app, or a backup code.</p></header>
         <div class="form-row">
           <label for="tf-code">Authentication code</label>
-          <input type="text" id="tf-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required />
+          <input type="text" id="tf-code" inputmode="text" autocomplete="one-time-code" maxlength="10" placeholder="123456 or backup code" required />
           <small class="field-err" data-err="tf-code"></small>
         </div>
         <button type="submit" class="btn-primary btn-block" id="tf-submit"><span class="btn-label">Verify &amp; sign in</span><span class="btn-spinner" aria-hidden="true"></span></button>
