@@ -107,3 +107,29 @@ PortalAccount in the CRM and the dashboard shows that customer's live, scoped da
 2. Self-serve site-visit booking (`calendar` + `scheduler`).
 3. Proposal viewer (`quotes`) + in-app/WhatsApp notifications (`notification`).
 4. 2FA via existing `twofa` module; PWA install.
+
+---
+
+## Delivered (status — 2026-06-22)
+
+Four scope-gated portals on the marketing site, all backed by the CRM via shared services.
+
+**Customer:** requirement brief wizard · live inventory · shortlist (save/remove) · book visit · proposals (accept/decline) · documents vault · editable profile · recent-activity timeline.
+**Developer:** projects/units · edit unit availability & rent (live everywhere via Redis cache invalidation) · client demand (anonymised) · site-visit requests + confirm · documents vault · editable profile · activity.
+**Channel Partner:** refer a lead · referred-leads + status · commissions + CSV statement · documents vault · editable profile · activity.
+
+**Cross-cutting (shared services):**
+- `SharedInventoryService` — single source for property/unit data, Redis-cached, `invalidatePublic` on writes.
+- `NotificationsService` — persisted + Redis pub/sub + **SSE** real-time bell; optional `phone` also sends **WhatsApp**.
+- `PasswordResetService` (single-use hashed tokens), `MailService` (SMTP + Ethereal dev path), `WhatsAppService` (Meta Cloud API), `TwoFactorService` (TOTP + backup codes), `DocumentsService`, `ActivityService`.
+
+**Security (parity across all 3 portals):** login rate-limiting · password reset (email delivery) · 2FA (TOTP) + backup codes.
+
+**Mediator guarantee:** developers/partners never receive customer phone/email (audited: 0 PII leaks); developer demand/visits are anonymised; all client comms are relayed by BayWorks server-side. Documented as a code contract.
+
+### Product decision — partner referral names (was "C6")
+Partners see the **name** of leads *they themselves referred* (deal tracking), never phone/email. Decision: **keep names, do not mask** — masking adds no mediation benefit (no contact info is exposed) and harms the partner's ability to track their own referrals.
+
+## Remaining
+- **Ops (needs credentials/hosting):** push repos + PRs; set real `SMTP_*` / `WHATSAPP_*`; production config + deploy; remove demo seeds before launch.
+- **Backlog:** developer respond-to-shortlist; customer shortlist compare; unify customer vault onto `PortalDocument`; automated tests; a11y/responsive pass; customer team/multi-seat workspaces.
