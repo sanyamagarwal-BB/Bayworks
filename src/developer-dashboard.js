@@ -56,6 +56,7 @@ function unitRow(u) {
     <div class="unit-controls">
       <span class="unit-rate">${esc(u.rate || '—')}</span>
       <span class="dash-tag ${STATUS_TONE_UNIT[u.status] || ''}">${esc(u.status)}</span>
+      <button type="button" class="btn-ghost btn-sm" data-act="interest" title="Notify clients who shortlisted this">Express interest</button>
       <button type="button" class="btn-ghost btn-sm" data-act="edit">Edit</button>
     </div>
   </li>`;
@@ -85,6 +86,13 @@ $('#dash-units').addEventListener('click', async (e) => {
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'edit') return editForm(li);
   if (act === 'cancel') return load();
+  if (act === 'interest') {
+    const btn = e.target.closest('[data-act="interest"]'); btn.disabled = true; btn.textContent = 'Sending…';
+    try { const r = await dev.expressInterest(li.dataset.unit); toast(r.notified ? `Notified ${r.notified} interested client${r.notified === 1 ? '' : 's'}.` : 'No clients have shortlisted this yet.'); }
+    catch (err) { toast(err.message || 'Could not send.', true); }
+    finally { btn.disabled = false; btn.textContent = 'Express interest'; }
+    return;
+  }
   if (act === 'save') {
     const status = li.querySelector('.unit-status').value;
     const rentRaw = li.querySelector('.unit-rent').value.trim();

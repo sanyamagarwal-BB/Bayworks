@@ -78,3 +78,5 @@ export const uploadDocument = (doc) => req('/developer-portal/documents', { meth
 export const deleteDocument = (id)  => req(`/developer-portal/documents/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
 
 export const activity = () => req('/developer-portal/activity', { auth: true });
+
+export const expressInterest = (unitId) => req(`/developer-portal/units/${encodeURIComponent(unitId)}/express-interest`, { method: 'POST', auth: true });
