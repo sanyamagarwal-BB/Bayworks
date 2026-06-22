@@ -183,3 +183,15 @@ document.getElementById('comm-download')?.addEventListener('click', async () => 
   });
   load();
 })();
+
+/* ── edit profile ───────────────────────────────────────────── */
+document.getElementById('prof-edit')?.addEventListener('click', () => {
+  const dl = document.getElementById('dash-profile'); const cur = partner.cachedUser() || {};
+  dl.innerHTML = `<div class="form-row"><label>Name</label><input id="pf-name" value="${esc(cur.name || '')}" /></div><div class="form-row"><label>Company</label><input id="pf-company" value="${esc(cur.company || '')}" /></div><div class="form-row"><label>Phone</label><input id="pf-phone" value="${esc(cur.phone || '')}" /></div><div style="display:flex;gap:.6rem;margin-top:.6rem"><button type="button" class="btn-primary btn-sm" id="pf-save">Save</button><button type="button" class="btn-ghost btn-sm" id="pf-cancel">Cancel</button></div>`;
+  document.getElementById('pf-cancel').addEventListener('click', load);
+  document.getElementById('pf-save').addEventListener('click', async () => {
+    const b = document.getElementById('pf-save'); b.disabled = true;
+    try { await partner.updateMe({ name: document.getElementById('pf-name').value, company: document.getElementById('pf-company').value, phone: document.getElementById('pf-phone').value }); toast('Profile updated.'); await load(); }
+    catch (err) { b.disabled = false; toast(err.message || 'Could not update.', true); }
+  });
+});

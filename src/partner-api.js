@@ -55,6 +55,7 @@ export const twoFaEnable  = (code) => req('/partner-portal/2fa/enable',  { metho
 export const twoFaDisable = (code) => req('/partner-portal/2fa/disable', { method: 'POST', body: { code }, auth: true });
 
 export const me          = () => req('/partner-portal/me',          { auth: true });
+export const updateMe    = (d) => req('/partner-portal/me', { method: 'PATCH', body: d, auth: true });
 export const summary     = () => req('/partner-portal/summary',     { auth: true });
 export const leads       = () => req('/partner-portal/leads',       { auth: true });
 export const referLead   = (d) => req('/partner-portal/leads',      { method: 'POST', body: d, auth: true });

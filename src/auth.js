@@ -251,6 +251,9 @@ export function logout() {
   portal.clearPortalToken();
 }
 
+/** Update the cached user for an API session (after a profile edit). */
+export function setCachedUser(u) { if (u) write(USER_CACHE, u); }
+
 /**
  * Guard a page: redirect to login (with return URL) if not authenticated.
  * @returns {boolean} true if authenticated.

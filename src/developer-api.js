@@ -53,6 +53,7 @@ export const twoFaEnable  = (code) => req('/developer-portal/2fa/enable',  { met
 export const twoFaDisable = (code) => req('/developer-portal/2fa/disable', { method: 'POST', body: { code }, auth: true });
 
 export const me       = () => req('/developer-portal/me',       { auth: true });
+export const updateMe = (d) => req('/developer-portal/me', { method: 'PATCH', body: d, auth: true });
 export const summary  = () => req('/developer-portal/summary',  { auth: true });
 export const projects = () => req('/developer-portal/projects', { auth: true });
 export const units    = () => req('/developer-portal/units',    { auth: true });

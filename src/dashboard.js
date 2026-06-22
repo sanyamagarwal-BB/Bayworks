@@ -6,7 +6,7 @@
  * scoped to this customer's lead. Otherwise (demo/offline) it shows mock data.
  * Any API failure mid-session also degrades to mock so the page never breaks.
  */
-import { requireAuth, getCurrentUser, logout, isApiSession } from './auth.js';
+import { requireAuth, getCurrentUser, logout, isApiSession, setCachedUser } from './auth.js';
 import * as portal from './portal-api.js';
 
 // Block render until authenticated. requireAuth() redirects (with ?next=) when
@@ -25,11 +25,34 @@ $('#dash-name').textContent = first;
 $('#dash-avatar').textContent = (user.name || user.email || '?').trim().charAt(0).toUpperCase();
 $('#dash-logout').addEventListener('click', () => { logout(); location.href = '/'; });
 
-/* ── profile (from session, always available) ───────────────── */
-$('#dash-profile').innerHTML = [
-  ['Name', user.name], ['Company', user.company || '—'],
-  ['Email', user.email], ['Phone', user.phone || '—'],
-].map(([k, v]) => `<div class="dash-prow"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+/* ── profile (from session, editable on API sessions) ───────── */
+let prof = { ...user };
+function renderProfile(u) {
+  $('#dash-profile').innerHTML = [
+    ['Name', u.name], ['Company', u.company || '—'], ['Email', u.email], ['Phone', u.phone || '—'],
+  ].map(([k, v]) => `<div class="dash-prow"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
+}
+renderProfile(prof);
+const profEditBtn = $('#prof-edit');
+if (profEditBtn && !isApiSession()) profEditBtn.style.display = 'none';
+profEditBtn?.addEventListener('click', () => {
+  const dl = $('#dash-profile');
+  dl.innerHTML = `
+    <div class="form-row"><label>Name</label><input id="pf-name" value="${esc(prof.name || '')}" /></div>
+    <div class="form-row"><label>Company</label><input id="pf-company" value="${esc(prof.company || '')}" /></div>
+    <div class="form-row"><label>Phone</label><input id="pf-phone" value="${esc(prof.phone || '')}" /></div>
+    <div style="display:flex;gap:.6rem;margin-top:.6rem"><button type="button" class="btn-primary btn-sm" id="pf-save">Save</button><button type="button" class="btn-ghost btn-sm" id="pf-cancel">Cancel</button></div>`;
+  $('#pf-cancel').addEventListener('click', () => renderProfile(prof));
+  $('#pf-save').addEventListener('click', async () => {
+    const btn = $('#pf-save'); btn.disabled = true;
+    try {
+      prof = await portal.updateMe({ name: $('#pf-name').value, company: $('#pf-company').value, phone: $('#pf-phone').value });
+      setCachedUser(prof); renderProfile(prof);
+      $('#dash-name').textContent = (prof.name || 'there').split(' ')[0];
+      toast('Profile updated.');
+    } catch (err) { btn.disabled = false; toast(err.message || 'Could not update profile.', true); }
+  });
+});
 
 /* ── mock data (demo / offline / API failure fallback) ──────── */
 const MOCK = {
