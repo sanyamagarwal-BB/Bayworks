@@ -100,7 +100,9 @@ async function loadPortalData() {
 }
 
 /* ── render ─────────────────────────────────────────────────── */
+let lastData = null;
 function render(data) {
+  lastData = data;
   $('#dash-stats').innerHTML = data.stats.map((s) => `
     <div class="dash-stat">
       <span class="dash-stat-val">${esc(s.value)}</span>
@@ -169,6 +171,24 @@ function toast(msg, isErr = false) {
 }
 
 loadPortalData().then(render);
+
+/* ── shortlist compare ──────────────────────────────────────── */
+$('#sl-compare')?.addEventListener('click', () => {
+  const panel = $('#sl-compare-panel');
+  if (!panel.hidden) { panel.hidden = true; panel.innerHTML = ''; return; }
+  const items = (lastData?.shortlist || []).filter((p) => p.name);
+  if (items.length < 2) { toast('Shortlist at least two spaces to compare.'); return; }
+  const rows = [
+    ['City', (p) => p.city || '—'],
+    ['Size', (p) => p.meta || '—'],
+    ['Rate', (p) => p.rate || '—'],
+  ];
+  panel.innerHTML = `<div style="overflow-x:auto"><table class="cmp-table">
+    <thead><tr><th></th>${items.map((p) => `<th>${esc(p.name)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(([label, fn]) => `<tr><td class="cmp-attr">${label}</td>${items.map((p) => `<td>${esc(fn(p))}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
+  panel.hidden = false;
+});
 
 /* ── proposals / quotes ─────────────────────────────────────── */
 const inr = (n) => `₹${Math.round(Number(n) || 0).toLocaleString('en-IN')}`;

@@ -2219,6 +2219,10 @@ a.login-item:hover { background: var(--green-light); }
 .prop-terms { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.8rem; color: var(--ink-muted); }
 .prop-terms b { color: var(--ink); font-weight: 600; }
 .prop-actions { display: flex; gap: 0.6rem; margin-top: 0.9rem; }
+.cmp-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.85rem; }
+.cmp-table th, .cmp-table td { border: 1px solid var(--gray-200); padding: 0.5rem 0.7rem; text-align: left; }
+.cmp-table thead th { background: var(--gray-50); font-family: var(--font-head); font-weight: 600; }
+.cmp-table .cmp-attr { font-weight: 600; color: var(--ink-muted); background: var(--gray-50); }
 .sec-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 #dash-2fa code { font-size: 0.78rem; background: var(--gray-100); padding: 0.1rem 0.35rem; border-radius: 4px; }
 .backup-codes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.7rem; }
