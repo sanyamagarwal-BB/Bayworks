@@ -80,3 +80,4 @@ export const deleteDocument = (id)  => req(`/developer-portal/documents/${encode
 export const activity = () => req('/developer-portal/activity', { auth: true });
 
 export const expressInterest = (unitId) => req(`/developer-portal/units/${encodeURIComponent(unitId)}/express-interest`, { method: 'POST', auth: true });
+export const respondShortlist = (shortlistId, response) => req(`/developer-portal/demand/${encodeURIComponent(shortlistId)}/respond`, { method: 'POST', body: { response }, auth: true });

@@ -15,6 +15,8 @@ $('#dash-avatar').textContent = (cached.name || 'D').trim().charAt(0).toUpperCas
 $('#dash-logout').addEventListener('click', () => { dev.logout(); location.href = '/'; });
 
 const STATUS_TONE = { AVAILABLE: 'dash-tag-green' };
+// Short labels for the developer's own fixed-template responses (mediation-safe).
+const RESP_LABEL = { AVAILABLE: 'Available', TOUR: 'Tour offered', WAITLIST: 'Waitlisted', UNAVAILABLE: 'Unavailable' };
 
 async function load() {
   let me, sum, projs, dem, unts;
@@ -35,11 +37,27 @@ async function load() {
       <span class="dash-tag ${p.available ? 'dash-tag-green' : ''}">${esc(p.available)}/${esc(p.units)} available</span>
     </li>`).join('') : `<li class="dash-empty">No projects yet.</li>`;
 
-  $('#dash-demand').innerHTML = dem.items.length ? dem.items.map((d) => `
-    <li class="dash-li">
+  $('#dash-demand').innerHTML = dem.items.length ? dem.items.map((d) => {
+    const canRespond = d.type === 'Shortlisted' && d.shortlistId;
+    const responded = d.devResponse ? RESP_LABEL[d.devResponse] || d.devResponse : null;
+    return `
+    <li class="dash-li"${canRespond ? ` data-shortlist="${esc(d.shortlistId)}"` : ''}>
       <div><p class="dash-li-title">${esc(d.label)}</p><p class="dash-li-meta">${esc(fmtDate(d.when))}</p></div>
-      <span class="dash-tag ${d.type === 'Site visit' ? 'dash-tag-green' : ''}">${esc(d.type)}</span>
-    </li>`).join('') : `<li class="dash-empty">No client interest yet.</li>`;
+      <div class="unit-controls">
+        <span class="dash-tag ${d.type === 'Site visit' ? 'dash-tag-green' : ''}">${esc(d.type)}</span>
+        ${canRespond ? (responded
+          ? `<span class="dash-tag dash-tag-green" data-resp-badge>${esc(responded)}</span>`
+          : `<select class="resp-pick prop-filter" aria-label="Respond to this interest">
+               <option value="">Respond…</option>
+               <option value="AVAILABLE">Confirm available</option>
+               <option value="TOUR">Offer a tour</option>
+               <option value="WAITLIST">Add to waitlist</option>
+               <option value="UNAVAILABLE">No longer available</option>
+             </select>
+             <button type="button" class="btn-ghost btn-sm" data-act="respond">Send</button>`) : ''}
+      </div>
+    </li>`;
+  }).join('') : `<li class="dash-empty">No client interest yet.</li>`;
 
   $('#dash-profile').innerHTML = [
     ['Name', me.name], ['Company', me.company || '—'], ['Email', me.email],
@@ -109,6 +127,21 @@ $('#dash-units').addEventListener('click', async (e) => {
       toast(err.message || 'Update failed.', true);
     }
   }
+});
+
+/* ── respond to anonymised demand (mediation-safe fixed templates) ── */
+$('#dash-demand')?.addEventListener('click', async (e) => {
+  if (!e.target.closest('[data-act="respond"]')) return;
+  const li = e.target.closest('.dash-li[data-shortlist]'); if (!li) return;
+  const pick = li.querySelector('.resp-pick');
+  const response = pick?.value;
+  if (!response) { toast('Pick a response first.', true); return; }
+  const btn = e.target.closest('[data-act="respond"]'); btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await dev.respondShortlist(li.dataset.shortlist, response);
+    li.querySelector('.unit-controls').innerHTML = `<span class="dash-tag dash-tag-green" data-resp-badge>${esc(RESP_LABEL[response] || response)}</span>`;
+    toast('Response sent — BayWorks will relay it to the client.');
+  } catch (err) { btn.disabled = false; btn.textContent = 'Send'; toast(err.message || 'Could not send.', true); }
 });
 
 let toastTimer;

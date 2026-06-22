@@ -90,7 +90,7 @@ async function loadPortalData() {
     ]);
     return {
       stats: s.stats,
-      shortlist: sl.items.map((p) => ({ unitId: p.unitId, name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '' })),
+      shortlist: sl.items.map((p) => ({ unitId: p.unitId, name: p.name, city: p.city, meta: p.meta, rate: p.rate, img: '', ownerResponse: p.ownerResponse })),
       requirements: r.items,
       visits: v.items.map((x) => ({ title: x.title, when: fmtVisit(x.when), meta: x.confirmed ? 'Confirmed' : x.status })),
     };
@@ -116,6 +116,7 @@ function render(data) {
         <h3>${esc(p.name)}</h3>
         <p class="dash-prop-meta">${esc([p.city, p.meta].filter(Boolean).join(' · '))}</p>
         <p class="dash-prop-rate">${esc(p.rate)}</p>
+        ${p.ownerResponse ? `<p class="dash-prop-owner"><span class="dash-tag dash-tag-green">${esc(p.ownerResponse)}</span></p>` : ''}
         ${p.unitId && isApiSession() ? `<div class="dash-prop-book">
           <input type="datetime-local" class="book-when" aria-label="Visit date and time" />
           <button type="button" class="btn-primary btn-sm" data-act="book">Book visit</button>

@@ -130,6 +130,15 @@ Four scope-gated portals on the marketing site, all backed by the CRM via shared
 ### Product decision — partner referral names (was "C6")
 Partners see the **name** of leads *they themselves referred* (deal tracking), never phone/email. Decision: **keep names, do not mask** — masking adds no mediation benefit (no contact info is exposed) and harms the partner's ability to track their own referrals.
 
+### Delivered later — customer team workspaces (was "C5") — 2026-06-22
+Multiple customer accounts share one workspace (Lead). Roles OWNER/MEMBER/VIEWER in the JWT, enforced server-side (VIEWER read-only; invite/remove OWNER-only). Tokenised 7-day email invites, accept-invite page, dashboard Team card. Stays inside one client company — mediation boundary untouched.
+
+### Delivered later — backlog cleared — 2026-06-22
+- **Developer respond-to-shortlist:** developers respond to anonymised demand with fixed templates (AVAILABLE/TOUR/WAITLIST/UNAVAILABLE) — no free text; BayWorks relays; customer identity never exposed. Customer sees a friendly owner-response label on their shortlist.
+- **Automated tests:** `npm run test:suite` — 46-check non-fail-fast suite across all portals + team workspaces + mediator audit.
+- **a11y + responsive:** skip-to-content links, global `:focus-visible`, `prefers-reduced-motion`, wrapping control rows on small screens.
+- **PWA:** installable (manifest + brand icons) with an offline-capable service worker (network-first navigations → offline fallback; SWR for assets; never caches `/crm-api`).
+
 ## Remaining
 - **Ops (needs credentials/hosting):** push repos + PRs; set real `SMTP_*` / `WHATSAPP_*`; production config + deploy; remove demo seeds before launch.
-- **Backlog:** developer respond-to-shortlist; customer shortlist compare; unify customer vault onto `PortalDocument`; automated tests; a11y/responsive pass; customer team/multi-seat workspaces.
+- **Considered & deferred:** unify customer vault onto `PortalDocument` (declined — would break staff doc-sharing via `LeadDocument`).

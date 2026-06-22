@@ -9,8 +9,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/src/style.css" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
 </head>
 <body class="dash-body">
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="dash-top">
     <a href="/" class="auth-logo"><span class="logo-text" style="color:var(--ink)">BAYWORKS<sup class="logo-tm">™</sup></span></a>
     <nav class="dash-top-nav">
@@ -24,7 +29,7 @@
     </div>
   </header>
 
-  <main class="dash-shell container">
+  <main class="dash-shell container" id="main">
     <section class="dash-hello">
       <p class="label-pill">Channel Partner Portal</p>
       <h1 class="dash-h1">Welcome, <span id="dash-firstname">Partner</span> <span id="dash-status" class="dash-tag" style="vertical-align:middle"></span></h1>

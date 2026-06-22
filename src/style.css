@@ -2321,3 +2321,50 @@ body.role-viewer [data-act="accept"],
 body.role-viewer [data-act="decline"],
 body.role-viewer [data-act="del"] { display: none !important; }
 
+/* Owner response badge on a customer's shortlisted space (B1). */
+.dash-prop-owner { margin-top: .5rem; }
+
+/* ══ Accessibility + responsive pass ════════════════════════════════════════ */
+
+/* Skip-to-content link — visible only when focused (keyboard users). */
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 3000;
+  background: var(--ink); color: #fff; padding: .6rem 1rem; border-radius: 0 0 8px 0;
+  font-family: var(--font-head); font-weight: 600; font-size: .85rem;
+}
+.skip-link:focus { left: 0; }
+
+/* Consistent, visible keyboard focus for every interactive control.
+   Mouse users are unaffected (:focus-visible only). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Let dense control rows wrap instead of overflowing on small screens. */
+.dash-card-head { flex-wrap: wrap; gap: .5rem; }
+.unit-controls { flex-wrap: wrap; }
+@media (max-width: 560px) {
+  .dash-top { flex-wrap: wrap; gap: .5rem .8rem; }
+  .dash-top-nav { order: 3; width: 100%; }
+  .unit-controls { width: 100%; justify-content: flex-start; }
+  .dash-prop-book { flex-wrap: wrap; }
+}
+
