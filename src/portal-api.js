@@ -87,3 +87,5 @@ export async function savedUnitIds() {
     return new Set();
   }
 }
+
+export const activity = () => req('/portal/activity', { auth: true });

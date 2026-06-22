@@ -381,3 +381,13 @@ loadSecurity();
 
 import { initBell } from './notify-bell.js';
 initBell({ basePath: '/portal', tokenKey: 'bayworks_portal_token' });
+
+/* ── recent activity ────────────────────────────────────────── */
+(async function initActivity() {
+  const el = document.getElementById('dash-activity'); if (!el) return;
+  if (!isApiSession()) { el.innerHTML = `<li class="dash-empty">Sign in to see your activity.</li>`; return; }
+  const ago = (iso) => { const s = Math.floor((Date.now() - new Date(iso)) / 1000); return s < 60 ? 'just now' : s < 3600 ? `${Math.floor(s / 60)}m ago` : s < 86400 ? `${Math.floor(s / 3600)}h ago` : new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); };
+  const label = (t) => t.replace(/_/g, ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+  try { const { items } = await portal.activity(); el.innerHTML = items.length ? items.map((a) => `<li class="dash-li"><div><p class="dash-li-title">${esc(label(a.type))}</p><p class="dash-li-meta">${esc(a.detail || '')}</p></div><span class="dash-li-meta">${esc(ago(a.createdAt))}</span></li>`).join('') : `<li class="dash-empty">No activity yet.</li>`; }
+  catch { el.innerHTML = `<li class="dash-empty">Could not load activity.</li>`; }
+})();

@@ -76,3 +76,5 @@ export const documents      = ()    => req('/developer-portal/documents', { auth
 export const documentUrl    = (id)  => req(`/developer-portal/documents/${encodeURIComponent(id)}`, { auth: true });
 export const uploadDocument = (doc) => req('/developer-portal/documents', { method: 'POST', body: doc, auth: true });
 export const deleteDocument = (id)  => req(`/developer-portal/documents/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
+
+export const activity = () => req('/developer-portal/activity', { auth: true });
