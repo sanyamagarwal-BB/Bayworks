@@ -80,7 +80,11 @@ views.signup.addEventListener('submit', async (e) => {
   if (data.password.length < 8) ok = setErr('su-pass', 'At least 8 characters.') && ok;
   if (!ok) return;
   const btn = $('#su-submit'); busy(btn, true);
-  try { await register(data); showToast('Account created. Redirecting…', 'success'); setTimeout(() => location.replace(next), 600); }
+  try {
+    const r = await register(data);
+    if (r && r.pending) { showToast(r.message || 'Account created — a BayWorks admin will activate it shortly.', 'success'); showView('signin'); }
+    else { showToast('Account created. Redirecting…', 'success'); setTimeout(() => location.replace(next), 600); }
+  }
   catch (err) { if (err.status === 409) setErr('su-email', err.message); else showToast(err.message || 'Could not create account.'); }
   finally { busy(btn, false); }
 });
