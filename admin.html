@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BAYWORKS™ CMS Dashboard</title>
+  <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -515,6 +516,10 @@
     .admin-field .field-error { display: none; font-size: 0.74rem; color: var(--danger); margin-top: 0.2rem; }
     .admin-field.invalid .field-error { display: block; }
   </style>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
 </head>
 <body>
 
@@ -1465,6 +1470,7 @@
                 <button type="button" class="client-logo-clear prop-img-clear" data-idx="${idx}">Clear image</button>
               </div>
               <input type="hidden" data-field="image" value="${esc(p.image)}" />
+              <input type="hidden" data-field="images" value="${esc(JSON.stringify(p.images || []))}" />
             </div>
             <div style="grid-column:1 / -1;"><label style="display:block; font-size:0.75rem; color:rgba(255,255,255,0.55); margin-bottom:0.3rem;">Name</label><input type="text" class="prop-input" data-field="name" value="${esc(p.name)}" style="${inputStyle}" /></div>
             <div><label style="display:block; font-size:0.75rem; color:rgba(255,255,255,0.55); margin-bottom:0.3rem;">City</label><select class="prop-input" data-field="city" style="${inputStyle}">${opts(PROP_CITIES, p.city)}</select></div>
@@ -1518,6 +1524,8 @@
           try {
             const dataURL = await fileToResizedDataURL(file, 1000, 0.82);
             card.querySelector('[data-field="image"]').value = dataURL;
+            const imagesField = card.querySelector('[data-field="images"]');
+            if (imagesField) imagesField.value = JSON.stringify([dataURL]);
             const preview = card.querySelector('.prop-img-preview');
             const empty = card.querySelector('.prop-img-empty');
             preview.src = dataURL; preview.style.display = 'block';
@@ -1534,6 +1542,8 @@
         btn.addEventListener('click', () => {
           const card = btn.closest('.property-edit-card');
           card.querySelector('[data-field="image"]').value = '';
+          const imagesField = card.querySelector('[data-field="images"]');
+          if (imagesField) imagesField.value = '[]';
           const preview = card.querySelector('.prop-img-preview');
           const empty = card.querySelector('.prop-img-empty');
           preview.removeAttribute('src'); preview.style.display = 'none';
@@ -1549,7 +1559,9 @@
       return Array.from(cards).map(card => {
         const get = f => card.querySelector(`[data-field="${f}"]`)?.value || '';
         const featured = card.querySelector('[data-field="featured"]')?.checked || false;
-        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status'), image: get('image'), featured };
+        let images = [];
+        try { images = JSON.parse(card.querySelector('[data-field="images"]')?.value || '[]'); } catch { images = []; }
+        return { name: get('name'), city: get('city'), size: get('size'), bucket: get('bucket'), price: get('price'), type: get('type'), status: get('status'), image: get('image'), images, featured };
       });
     }
 

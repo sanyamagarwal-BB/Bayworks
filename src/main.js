@@ -711,45 +711,6 @@ function showQuizResult(pkgType) {
   track('quiz_completed', { recommendation: pkgType });
 }
 
-/* LIVE CHAT */
-document.getElementById('chat-open')?.addEventListener('click', () => {
-  document.getElementById('chat-widget').classList.add('open');
-  document.getElementById('chat-open').style.display = 'none';
-  track('chat_opened');
-});
-
-document.getElementById('chat-close')?.addEventListener('click', () => {
-  document.getElementById('chat-widget').classList.remove('open');
-  document.getElementById('chat-open').style.display = 'block';
-});
-
-document.getElementById('chat-send')?.addEventListener('click', sendMessage);
-document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendMessage();
-});
-
-function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if (!text) return;
-  
-  const msgs = document.getElementById('chat-messages');
-  const userMsg = document.createElement('div');
-  userMsg.className = 'chat-msg user-msg';
-  userMsg.innerHTML = `<p>${text}</p>`;
-  msgs.appendChild(userMsg);
-  input.value = '';
-  msgs.scrollTop = msgs.scrollHeight;
-  
-  setTimeout(() => {
-    const botMsg = document.createElement('div');
-    botMsg.className = 'chat-msg bot-msg';
-    const waMsg = encodeURIComponent(`Hi BAYWORKS, ${text}`);
-    botMsg.innerHTML = `<p>Thanks — our team will reply here shortly. For an instant response, <a href="https://wa.me/919205005399?text=${waMsg}" target="_blank" rel="noopener" style="color:var(--green); font-weight:600; text-decoration:underline;">message us on WhatsApp</a>.</p>`;
-    msgs.appendChild(botMsg);
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 500);
-}
 
 /* MOBILE APP NOTIFICATION */
 document.getElementById('app-notify')?.addEventListener('click', () => {

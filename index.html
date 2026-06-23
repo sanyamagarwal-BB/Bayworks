@@ -3,14 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BAYWORKS™ | Corporate Leasing & Workspace Solutions</title>
-  <meta name="description" content="Grade-A office spaces across 12 Indian cities and Dubai. 100% owner-verified shortlist in 48 hours. Zero CapEx. In-house legal." />
+  <title>BayWorks | Premium Commercial Office Spaces in India</title>
+  <meta name="description" content="BayWorks helps corporates find Grade-A managed office spaces, coworking, and commercial real estate across India. Zero CapEx, managed fit-outs, and transparent pricing." />
+  <link rel="canonical" href="https://bayworks.in/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://bayworks.in/" />
+  <meta property="og:title"       content="BayWorks | Premium Commercial Office Spaces in India" />
+  <meta property="og:description" content="BayWorks helps corporates find Grade-A managed office spaces, coworking, and commercial real estate across India. Zero CapEx, managed fit-outs, and transparent pricing." />
+  <meta property="og:image"       content="https://bayworks.in/og-image.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="BayWorks | Premium Commercial Office Spaces in India" />
+  <meta name="twitter:description" content="BayWorks helps corporates find Grade-A managed office spaces, coworking, and commercial real estate across India. Zero CapEx, managed fit-outs, and transparent pricing." />
+  <meta name="twitter:image"       content="https://bayworks.in/og-image.jpg" />
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "BayWorks",
+    "url": "https://bayworks.in/",
+    "description": "BayWorks helps corporates find Grade-A managed office spaces, coworking, and commercial real estate across India. Zero CapEx, managed fit-outs, and transparent pricing.",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-92050-05399",
+      "contactType": "sales",
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi"]
+    }
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/src/style.css" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
 </head>
 <body>
 
@@ -278,9 +314,14 @@
           <h2 class="section-h2">Featured Properties</h2>
           <p class="section-sub">A hand-picked look at standout spaces available right now. Tap any to view full details.</p>
         </div>
-        <div id="featured-grid" class="featured-grid" data-limit="4"></div>
-        <div class="featured-cta">
-          <a href="/properties.html" class="btn-primary">Browse all properties &rarr;</a>
+        <div class="featured-ribbon">
+          <button type="button" class="ribbon-arrow ribbon-prev" id="featured-prev" aria-label="Scroll left">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div id="featured-grid" class="featured-row"></div>
+          <button type="button" class="ribbon-arrow ribbon-next" id="featured-next" aria-label="Scroll right">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -538,29 +579,6 @@
     </section>
 
     <!-- FOOTER -->
-    <section id="chat-section" class="section-light" style="position: relative;">
-      <div class="container">
-        <div class="section-header-row">
-          <div class="section-tag">Support</div>
-          <h2 class="section-h2">Live Chat Support<br/>Right Now</h2>
-          <p class="section-sub">Questions answered in less than 2 minutes. No bots, no hold music. Real team.</p>
-        </div>
-      </div>
-      <div id="chat-widget" class="chat-widget">
-        <div class="chat-header">
-          <h3><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-message-circle" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> </svg> Chat with BAYWORKS</h3>
-          <button id="chat-close" class="chat-close">✕</button>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="chat-msg bot-msg"><p>Hi! How can we help you today?</p></div>
-        </div>
-        <div class="chat-input">
-          <input type="text" id="chat-input" placeholder="Ask anything..." />
-          <button id="chat-send">Send</button>
-        </div>
-      </div>
-      <button id="chat-open" class="chat-open-btn" aria-label="Open live chat"><span class="chat-online-dot" aria-hidden="true"></span><svg aria-hidden="true" style="vertical-align:-0.125em" class="lucide lucide-message-circle" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" > <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /> </svg> Chat with us</button>
-    </section>
 
     <!-- 7. GOOGLE MAPS INTEGRATION -->
     <footer class="site-footer">
@@ -603,6 +621,19 @@
 
   </main>
 
+  <!-- PROPERTY DETAIL MODAL -->
+  <dialog id="property-modal" class="site-modal property-modal">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h3>Property Details</h3>
+        <button type="button" class="modal-close" data-modal-close aria-label="Close">&times;</button>
+      </div>
+      <div id="property-modal-body" class="property-modal-body"></div>
+    </div>
+  </dialog>
+
   <script type="module" src="/src/main.js"></script>
+  <script src="/chat.js"></script>
+  <script>BayWorksChat.init({ tenantId: '' });</script>
 </body>
 </html>

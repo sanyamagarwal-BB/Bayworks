@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Property Detail | BayWorks</title>
+  <meta name="description" content="View full details, amenities, pricing, and book a visit for this commercial office space listed by BayWorks." />
+  <meta name="robots" content="noindex" />
+
+  <!-- Open Graph (updated dynamically after load) -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="BayWorks" />
+  <meta property="og:title"       id="og-title"       content="Property Detail | BayWorks" />
+  <meta property="og:description" id="og-description" content="View full details, amenities, pricing, and book a visit for this commercial office space listed by BayWorks." />
+  <meta property="og:image"       content="https://bayworks.in/og-image.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:   #6366f1;
+      --brand-d: #4f46e5;
+      --navy:    #0f172a;
+      --slate:   #1e293b;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --bg:      #f8fafc;
+      --white:   #ffffff;
+      --radius:  12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Navigation ───────────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-logo {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      color: var(--navy);
+    }
+    .nav-logo sup { font-size: 10px; }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .nav-links a:hover { color: var(--brand); }
+    .btn-nav-cta {
+      background: var(--brand);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.18s;
+      white-space: nowrap;
+    }
+    .btn-nav-cta:hover { background: var(--brand-d); }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+
+    /* ── Page shell ───────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* ── Back link ────────────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 24px;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--brand); }
+
+    /* ── Skeleton loader ──────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+    .skel-hero  { height: 320px; width: 100%; border-radius: var(--radius); margin-bottom: 28px; }
+    .skel-title { height: 32px; width: 60%; margin-bottom: 16px; }
+    .skel-meta  { height: 18px; width: 40%; margin-bottom: 24px; }
+    .skel-body  { height: 14px; margin-bottom: 10px; }
+    .skel-body.short { width: 70%; }
+    #skeleton-wrap { display: block; }
+    #detail-wrap   { display: none; }
+
+    /* ── Detail card ──────────────────────────────────────────── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+
+    .detail-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: var(--radius);
+      background: #e2e8f0;
+      display: block;
+    }
+    .detail-image-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .detail-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .badge-type    { background: #eef2ff; color: var(--brand); }
+    .badge-city    { background: #f0fdf4; color: #16a34a; }
+    .badge-status  { background: #fef9c3; color: #92400e; }
+    .badge-floor   { background: #f1f5f9; color: var(--muted); }
+
+    .detail-h1 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .detail-developer {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .detail-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin: 28px 0 12px;
+    }
+
+    .detail-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    .amenities-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .amenity-tag {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--slate);
+    }
+
+    /* ── Sticky booking card ──────────────────────────────────── */
+    .booking-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .booking-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .booking-price {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .booking-price-unit {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .booking-estimate {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .booking-estimate strong { color: var(--navy); }
+
+    .btn-book {
+      display: block;
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.18s, transform 0.12s;
+    }
+    .btn-book:hover { background: var(--brand-d); transform: translateY(-1px); }
+
+    .btn-wa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: none;
+      transition: background 0.18s;
+    }
+    .btn-wa:hover { background: #1da851; }
+
+    .booking-note {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    /* ── Contact Form ─────────────────────────────────────────── */
+    .contact-section {
+      margin-top: 64px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+    }
+    @media (max-width: 640px) {
+      .contact-section { padding: 24px 20px; }
+    }
+    .contact-heading {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .contact-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+    .form-input {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--navy);
+      background: #f8fafc;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .form-input:focus { border-color: var(--brand); background: var(--white); }
+    .btn-submit {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 0.18s, transform 0.12s;
+    }
+    .btn-submit:hover { background: var(--brand-d); transform: translateY(-1px); }
+    .form-success {
+      display: none;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-size: 14px;
+      color: #15803d;
+      font-weight: 500;
+      margin-top: 16px;
+    }
+    .form-error {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #b91c1c;
+      margin-top: 12px;
+    }
+
+    /* ── Not found ────────────────────────────────────────────── */
+    .not-found {
+      text-align: center;
+      padding: 80px 24px;
+      display: none;
+    }
+    .not-found h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+    .not-found p  { color: var(--muted); margin-bottom: 24px; }
+    .btn-back {
+      display: inline-block;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-weight: 600;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    .simple-footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+  </style>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+</head>
+<body>
+
+  <!-- ── Navigation ─────────────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">BAYWORKS<sup>™</sup></a>
+      <div class="nav-links">
+        <a href="/#pain">Why Us</a>
+        <a href="/#services">Services</a>
+        <a href="/properties.html">Properties</a>
+        <a href="/about.html">About</a>
+        <a href="/#contact">Contact</a>
+      </div>
+      <a href="https://wa.me/919205005399" target="_blank" rel="noopener noreferrer" class="btn-nav-cta">Talk to Us</a>
+    </div>
+  </nav>
+
+  <!-- ── Page content ───────────────────────────────────────────── -->
+  <div class="page-wrap">
+
+    <a href="/properties.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to Properties
+    </a>
+
+    <!-- Skeleton -->
+    <div id="skeleton-wrap">
+      <div class="skeleton skel-hero"></div>
+      <div class="skeleton skel-title"></div>
+      <div class="skeleton skel-meta"></div>
+      <div class="skeleton skel-body"></div>
+      <div class="skeleton skel-body short"></div>
+      <div class="skeleton skel-body"></div>
+    </div>
+
+    <!-- Not found state -->
+    <div class="not-found" id="not-found-wrap">
+      <h2>Property Not Found</h2>
+      <p>We couldn't find that listing. It may have been removed or the link is incorrect.</p>
+      <a href="/properties.html" class="btn-back">Browse All Properties</a>
+    </div>
+
+    <!-- Detail content -->
+    <div id="detail-wrap">
+      <div class="detail-grid">
+
+        <!-- Left column -->
+        <div>
+          <div id="detail-image-wrap"></div>
+
+          <div class="detail-badges" id="detail-badges"></div>
+
+          <h1 class="detail-h1" id="detail-title"></h1>
+          <p class="detail-developer" id="detail-developer"></p>
+
+          <div class="detail-stats" id="detail-stats"></div>
+
+          <div class="section-title">About This Space</div>
+          <p class="detail-desc" id="detail-desc"></p>
+
+          <div class="section-title" id="amenities-heading" style="display:none;">Amenities</div>
+          <div class="amenities-grid" id="detail-amenities"></div>
+        </div>
+
+        <!-- Right column: Booking card -->
+        <div>
+          <div class="booking-card">
+            <div class="booking-price-row">
+              <span class="booking-price" id="book-price">—</span>
+              <span class="booking-price-unit" id="book-price-unit"></span>
+            </div>
+            <div class="booking-estimate" id="book-estimate"></div>
+            <button class="btn-book" onclick="scrollToForm()">Book a Visit</button>
+            <a
+              id="book-wa"
+              href="https://wa.me/919205005399"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-wa"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.09.538 4.055 1.476 5.765L0 24l6.395-1.652A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.856 0-3.596-.5-5.1-1.373l-.366-.216-3.8.982.998-3.72-.239-.382A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+              </svg>
+              WhatsApp Us
+            </a>
+            <p class="booking-note">Free consultation — no commitment required.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact / Visit Request form -->
+      <div class="contact-section" id="contact-form-section">
+        <h2 class="contact-heading">Book a Visit</h2>
+        <p class="contact-sub">Fill in your details and our team will confirm a time within 2 hours.</p>
+
+        <form id="visit-form" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="v-name">Your Name</label>
+              <input class="form-input" id="v-name" name="name" type="text" placeholder="Rahul Sharma" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="v-phone">WhatsApp / Phone</label>
+              <input class="form-input" id="v-phone" name="phone" type="tel" placeholder="+91 98765 43210" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="v-email">Email Address</label>
+              <input class="form-input" id="v-email" name="email" type="email" placeholder="rahul@company.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="v-date">Preferred Visit Date</label>
+              <input class="form-input" id="v-date" name="preferredDate" type="date" />
+            </div>
+            <div class="form-group full">
+              <label class="form-label" for="v-msg">Additional Notes (optional)</label>
+              <input class="form-input" id="v-msg" name="message" type="text" placeholder="Team size, specific requirements…" />
+            </div>
+          </div>
+          <div style="margin-top: 20px;">
+            <button type="submit" class="btn-submit" id="submit-btn">Request a Visit</button>
+          </div>
+          <div class="form-success" id="form-success">
+            Your visit request has been received! Our team will contact you within 2 hours to confirm.
+          </div>
+          <div class="form-error" id="form-error">
+            Something went wrong. Please try again or WhatsApp us directly.
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer class="simple-footer">
+    © 2025 Billionaires Bay Global Realty LLP. All Rights Reserved. &nbsp;|&nbsp; BAYWORKS™
+  </footer>
+
+  <script src="/chat.js"></script>
+  <script>BayWorksChat.init({ tenantId: '' });</script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Read unitId from URL ─────────────────────────────── */
+      var params = new URLSearchParams(window.location.search);
+      var unitId = params.get('unitId') || '';
+
+      var skeletonEl  = document.getElementById('skeleton-wrap');
+      var detailEl    = document.getElementById('detail-wrap');
+      var notFoundEl  = document.getElementById('not-found-wrap');
+
+      function showNotFound() {
+        skeletonEl.style.display = 'none';
+        notFoundEl.style.display = 'block';
+      }
+
+      function showDetail() {
+        skeletonEl.style.display = 'none';
+        detailEl.style.display   = 'block';
+      }
+
+      /* ── Helpers ──────────────────────────────────────────── */
+      function esc(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function formatPrice(pricePerSqft, areaSqft) {
+        if (!pricePerSqft || !areaSqft) return null;
+        var monthly = Math.round(pricePerSqft * areaSqft);
+        if (monthly >= 100000) return '₹' + (monthly / 100000).toFixed(1) + 'L/mo';
+        return '₹' + monthly.toLocaleString('en-IN') + '/mo';
+      }
+
+      /* ── Render unit ──────────────────────────────────────── */
+      function render(unit) {
+        // Dynamic <title> + OG
+        var pageTitle = esc(unit.projectName || unit.name || 'Property') +
+          (unit.city ? ' — ' + esc(unit.city) : '') + ' | BayWorks';
+        document.title = pageTitle;
+        var ogTitle = document.getElementById('og-title');
+        var ogDesc  = document.getElementById('og-description');
+        if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+        if (ogDesc)  ogDesc.setAttribute('content',
+          'Grade-A ' + esc(unit.type || 'office space') + ' in ' + esc(unit.city || 'India') +
+          '. ' + (unit.areaSqft ? esc(unit.areaSqft) + ' sq ft. ' : '') +
+          'Book a visit with BayWorks today.'
+        );
+
+        /* Image */
+        var imgWrap = document.getElementById('detail-image-wrap');
+        if (unit.image || (unit.images && unit.images[0])) {
+          var src = unit.image || unit.images[0];
+          imgWrap.innerHTML = '<img class="detail-image" src="' + esc(src) + '" alt="' + esc(unit.projectName || unit.name) + '" />';
+        } else {
+          var initials = (unit.projectName || unit.name || 'BW').substring(0, 2).toUpperCase();
+          imgWrap.innerHTML = '<div class="detail-image-placeholder">' + esc(initials) + '</div>';
+        }
+
+        /* Badges */
+        var badgesEl = document.getElementById('detail-badges');
+        var badgesHtml = '';
+        if (unit.type)       badgesHtml += '<span class="badge badge-type">' + esc(unit.type) + '</span>';
+        if (unit.city)       badgesHtml += '<span class="badge badge-city">' + esc(unit.city) + '</span>';
+        if (unit.status)     badgesHtml += '<span class="badge badge-status">' + esc(unit.status) + '</span>';
+        if (unit.floor)      badgesHtml += '<span class="badge badge-floor">Floor ' + esc(unit.floor) + '</span>';
+        if (unit.furnishing) badgesHtml += '<span class="badge badge-floor">' + esc(unit.furnishing) + '</span>';
+        badgesEl.innerHTML = badgesHtml;
+
+        /* Title */
+        document.getElementById('detail-title').textContent = unit.projectName || unit.name || 'Office Space';
+
+        /* Developer */
+        var devEl = document.getElementById('detail-developer');
+        var devParts = [];
+        if (unit.developer) devParts.push('By ' + unit.developer);
+        if (unit.city)      devParts.push(unit.city);
+        devEl.textContent = devParts.join('  •  ');
+
+        /* Stats */
+        var statsEl = document.getElementById('detail-stats');
+        var stats = [];
+        if (unit.areaSqft)       stats.push({ label: 'Area',       value: unit.areaSqft + ' sq ft' });
+        else if (unit.size)      stats.push({ label: 'Area',       value: unit.size });
+        if (unit.pricePerSqft)   stats.push({ label: 'Rate',       value: '₹' + unit.pricePerSqft + '/sq ft/mo' });
+        else if (unit.price)     stats.push({ label: 'Rate',       value: unit.price });
+        if (unit.type)           stats.push({ label: 'Type',       value: unit.type });
+        if (unit.furnishing)     stats.push({ label: 'Furnishing', value: unit.furnishing });
+        if (unit.floor)          stats.push({ label: 'Floor',      value: unit.floor });
+        if (unit.developer)      stats.push({ label: 'Developer',  value: unit.developer });
+        statsEl.innerHTML = stats.map(function (s) {
+          return '<div class="stat-card"><div class="stat-label">' + esc(s.label) + '</div>' +
+                 '<div class="stat-value">' + esc(s.value) + '</div></div>';
+        }).join('');
+
+        /* Description */
+        var descEl = document.getElementById('detail-desc');
+        descEl.textContent = unit.description ||
+          ('Grade-A ' + (unit.type || 'office space') + ' located in ' + (unit.city || 'India') + '. ' +
+           'This space is available for immediate occupation with full BayWorks advisory support including legal due diligence and lease structuring at zero extra cost.');
+
+        /* Amenities */
+        var amenList = unit.amenities;
+        if (amenList) {
+          if (typeof amenList === 'string') {
+            try { amenList = JSON.parse(amenList); } catch { amenList = amenList.split(',').map(function(a){return a.trim();}); }
+          }
+          if (Array.isArray(amenList) && amenList.length) {
+            document.getElementById('amenities-heading').style.display = 'block';
+            document.getElementById('detail-amenities').innerHTML = amenList.map(function (a) {
+              return '<span class="amenity-tag">' + esc(a) + '</span>';
+            }).join('');
+          }
+        }
+
+        /* Booking card */
+        var pricePerSqft = parseFloat(unit.pricePerSqft) || 0;
+        var areaSqft     = parseFloat(String(unit.areaSqft || '').replace(/[^0-9.]/g, '')) || 0;
+
+        if (unit.pricePerSqft) {
+          document.getElementById('book-price').textContent = '₹' + unit.pricePerSqft;
+          document.getElementById('book-price-unit').textContent = '/ sq ft / mo';
+        } else if (unit.price) {
+          document.getElementById('book-price').textContent = unit.price;
+          document.getElementById('book-price-unit').textContent = '';
+        }
+
+        var estimateEl = document.getElementById('book-estimate');
+        if (pricePerSqft && areaSqft) {
+          var monthly = formatPrice(pricePerSqft, areaSqft);
+          estimateEl.innerHTML = 'Estimated monthly: <strong>' + esc(monthly) + '</strong>';
+        } else {
+          estimateEl.textContent = 'Contact us for pricing details.';
+        }
+
+        /* WhatsApp link */
+        var waLink = document.getElementById('book-wa');
+        var waMsg = encodeURIComponent(
+          'Hi BayWorks, I\'m interested in:\n• Property: ' + (unit.projectName || unit.name || unitId) +
+          '\n• City: ' + (unit.city || '—') +
+          '\n• Area: ' + (unit.areaSqft ? unit.areaSqft + ' sq ft' : (unit.size || '—')) +
+          '\n\nPlease share availability and schedule a visit.'
+        );
+        waLink.href = 'https://wa.me/919205005399?text=' + waMsg;
+
+        showDetail();
+      }
+
+      /* ── Fetch & find unit ────────────────────────────────── */
+      async function loadUnit() {
+        if (!unitId) { showNotFound(); return; }
+
+        try {
+          var res = await fetch('/api/public/listings', { credentials: 'omit' });
+          if (!res.ok) throw new Error('API error ' + res.status);
+          var data = await res.json();
+
+          // The API may return { units: [...] } or an array directly
+          var units = Array.isArray(data) ? data
+            : (data.units && Array.isArray(data.units)) ? data.units
+            : (data.listings && Array.isArray(data.listings)) ? data.listings
+            : [];
+
+          var unit = units.find(function (u) {
+            return String(u.id) === String(unitId) ||
+                   String(u._id) === String(unitId) ||
+                   String(u.unitId) === String(unitId);
+          });
+
+          if (!unit) { showNotFound(); return; }
+          render(unit);
+        } catch (err) {
+          console.error('[property-detail] Failed to load unit:', err);
+          showNotFound();
+        }
+      }
+
+      /* ── Visit request form ───────────────────────────────── */
+      document.getElementById('visit-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var btn       = document.getElementById('submit-btn');
+        var successEl = document.getElementById('form-success');
+        var errorEl   = document.getElementById('form-error');
+
+        successEl.style.display = 'none';
+        errorEl.style.display   = 'none';
+        btn.disabled    = true;
+        btn.textContent = 'Sending…';
+
+        var payload = {
+          name:          document.getElementById('v-name').value.trim(),
+          phone:         document.getElementById('v-phone').value.trim(),
+          email:         document.getElementById('v-email').value.trim(),
+          preferredDate: document.getElementById('v-date').value,
+          message:       document.getElementById('v-msg').value.trim(),
+          unitId:        unitId,
+          tenantId:      '',
+          source:        'property-detail',
+        };
+
+        try {
+          var res = await fetch('/api/public/visit-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            successEl.style.display = 'block';
+            e.target.reset();
+          } else {
+            throw new Error('Server error ' + res.status);
+          }
+        } catch (err) {
+          console.error('[property-detail] Visit request failed:', err);
+          errorEl.style.display = 'block';
+        } finally {
+          btn.disabled    = false;
+          btn.textContent = 'Request a Visit';
+        }
+      });
+
+      /* ── Scroll helper ────────────────────────────────────── */
+      window.scrollToForm = function () {
+        document.getElementById('contact-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      /* ── Boot ─────────────────────────────────────────────── */
+      loadUnit();
+    })();
+  </script>
+
+</body>
+</html>
