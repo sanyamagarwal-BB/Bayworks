@@ -70,6 +70,15 @@ node dist/main.js             # or: pm2 / systemd / container CMD
 
 ## 3. Marketing site
 
+> **Chosen layout (2026-06-23): subdomain split** — `bayworks.in` serves the
+> marketing landing page; `app.bayworks.in` serves the three portals + CRM web.
+> The portals currently live inside the marketing build as `*.html` pages, so the
+> split is executed at deploy: either deploy the same build to both hosts and let
+> each domain show its slice, or split the portal pages into their own deployment.
+> Because the two domains are cross-origin, use **Option A (CORS)** below
+> (`VITE_CRM_BASE=https://crm.bayworks.in/api`, `CORS_ORIGIN` listing
+> `https://app.bayworks.in`). See ROADMAP.md → "Subdomain split execution".
+
 Static build. The one decision is **how the browser reaches the CRM API**:
 
 **Option A — cross-origin + CORS (simplest, no hardcoded host):**
