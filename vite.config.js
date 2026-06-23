@@ -11,6 +11,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         properties: resolve(__dirname, 'properties.html'),
+        propertiesDetail: resolve(__dirname, 'properties-detail.html'),
         about: resolve(__dirname, 'about.html'),
         admin: resolve(__dirname, 'admin.html'),
         login: resolve(__dirname, 'login.html'),

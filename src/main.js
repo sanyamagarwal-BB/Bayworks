@@ -335,6 +335,7 @@ function openPropertyModal(idx) {
         <div><span>Type</span><strong>${p.type || '—'}</strong></div>
         <div><span>Status</span><strong>${p.status || 'Available'}</strong></div>
       </div>
+      ${p.unitId ? `<a class="btn-ghost btn-block" style="margin:.2rem 0 1rem" href="/properties-detail.html?unitId=${encodeURIComponent(p.unitId)}">View full details</a>` : ''}
       <div class="connect-box">
         <p class="connect-title">Interested? Leave your number and our team will connect you.</p>
         <input type="tel" id="connect-phone" class="connect-input" placeholder="Your phone number" autocomplete="tel" />
