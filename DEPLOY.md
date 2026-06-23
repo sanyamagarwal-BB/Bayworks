@@ -112,6 +112,39 @@ Separate React/Vite app under `crm/web` (default dev port 5180). Build and host
 it at `crm.bayworks.in`; point `VITE_CRM_WEB_URL` (marketing site) at its
 `/login`. See `crm/CLAUDE.md` for its build details.
 
+## 5. WhatsApp auto-reply bot
+
+Inbound WhatsApp messages get an automatic AI reply (Claude, with a rule-based
+fallback), auto-capture a lead, run BANT qualification, and hand off to a human
+on request. Two interchangeable gateways are wired — **use one per number.**
+
+All credentials are entered IT-only in the **IT Console** (`/it` → Integrations);
+console values override env and take effect live without a redeploy.
+
+### Recommended: Picky Assist (faster launch)
+1. IT Console → **Picky Assist — WhatsApp Gateway** → paste **API Token**.
+2. Set **Channel** to `101` (WhatsApp Cloud API) or `8` (WhatsApp Official).
+   **Do not use `1` (WhatsApp Personal)** — that's web-automation and risks a
+   number ban.
+3. Enable + Save.
+4. In Picky Assist → Webhook (JSON method), set the incoming-message URL to:
+   `https://app.bayworks.in/api/public/webhook/pickyassist`
+   (dev: `https://<tunnel>/api/public/webhook/pickyassist`).
+   Replies are returned synchronously — no outbound token needed just to reply.
+
+Outbound notifications (proposal sent, owner response, handoff pings) auto-route
+through Picky Assist whenever its token is set, else fall back to Meta.
+
+### Alternative: Meta WhatsApp Cloud API (fallback)
+1. IT Console → **WhatsApp Cloud API** → paste **Access Token** + **Phone Number
+   ID** (Meta → WhatsApp → API Setup) + a **Verify Token** of your choice. Enable.
+2. Meta → WhatsApp → Configuration → Callback URL:
+   `https://app.bayworks.in/api/public/webhook/whatsapp`, same Verify Token,
+   subscribe the **messages** field.
+
+> Run only ONE gateway per number — running both splits conversation threads
+> and double-handles messages.
+
 ---
 
 ## Pre-launch checklist
@@ -121,7 +154,8 @@ it at `crm.bayworks.in`; point `VITE_CRM_WEB_URL` (marketing site) at its
 - [ ] HTTPS on both origins (required for the PWA service worker and secure cookies).
 - [ ] CORS or rewrite wired (§3) — test a portal login end-to-end.
 - [ ] SMTP set and a real password-reset / team-invite email arrives.
-- [ ] WhatsApp creds set (optional) and a test relay arrives.
+- [ ] WhatsApp gateway configured (§5 — Picky Assist or Meta, one per number);
+      send a test inbound and confirm the bot replies.
 - [ ] `npm run test:suite` (in `crm/api`) is green against staging.
 - [ ] **A4 — remove demo seeds** before go-live (demo accounts + mock listings).
       This is destructive; run it deliberately once the above is verified.
