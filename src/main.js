@@ -494,8 +494,11 @@ function initNav() {
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('nav-mobile');
 
-  // Scroll class
-  const onScroll = () => nav?.classList.toggle('scrolled', window.scrollY > 50);
+  // Scroll class — pages with no dark hero (data-nav-solid) keep the solid/opaque
+  // nav state at all times, since the transparent state is unreadable without a
+  // dark background behind it.
+  const alwaysSolid = document.body.hasAttribute('data-nav-solid');
+  const onScroll = () => nav?.classList.toggle('scrolled', alwaysSolid || window.scrollY > 50);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 

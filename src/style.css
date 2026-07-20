@@ -81,20 +81,21 @@ img { display: block; max-width: 100%; }
   transition: background var(--mid), border-color var(--mid), box-shadow var(--fast);
   border-bottom: 1px solid transparent;
 }
-.nav.scrolled {
+.nav.scrolled, [data-nav-solid] .nav {
   background: rgba(255,255,255,0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gray-200);
   box-shadow: 0 1px 16px rgba(15,23,42,0.08);
 }
-/* White elements when nav is transparent (over hero photo) */
-.nav:not(.scrolled) .logo-text { color: #FFFFFF; }
-.nav:not(.scrolled) .nav-links a { color: rgba(255,255,255,0.80); }
-.nav:not(.scrolled) .nav-links a:hover { color: #FFFFFF; background: rgba(255,255,255,0.10); }
-.nav:not(.scrolled) .btn-connect { background: #FFFFFF; color: var(--green); }
-.nav:not(.scrolled) .btn-connect:hover { background: var(--green-light); }
-.nav:not(.scrolled) .btn-audio { border-color: rgba(255,255,255,0.30); color: rgba(255,255,255,0.75); }
-.nav:not(.scrolled) .nav-hamburger span { background: #FFFFFF; }
+/* White elements when nav is transparent (over hero photo) — pages with no dark
+   hero (data-nav-solid on <body>) always keep the solid nav above, never this. */
+body:not([data-nav-solid]) .nav:not(.scrolled) .logo-text { color: #FFFFFF; }
+body:not([data-nav-solid]) .nav:not(.scrolled) .nav-links a { color: rgba(255,255,255,0.80); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .nav-links a:hover { color: #FFFFFF; background: rgba(255,255,255,0.10); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .btn-connect { background: #FFFFFF; color: var(--green); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .btn-connect:hover { background: var(--green-light); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .btn-audio { border-color: rgba(255,255,255,0.30); color: rgba(255,255,255,0.75); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .nav-hamburger span { background: #FFFFFF; }
 
 /* When the mobile menu is open, force a solid nav so the dropdown never shows
    the hero bleeding through (even at the top of the page where nav is transparent). */
@@ -2124,8 +2125,8 @@ img { display: block; max-width: 100%; }
   transition: all var(--fast);
 }
 .nav-login-link:hover { background: var(--green-light); border-color: var(--green); }
-.nav:not(.scrolled) .nav-login-link { color: #fff; border-color: rgba(255,255,255,0.45); }
-.nav:not(.scrolled) .nav-login-link:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
+body:not([data-nav-solid]) .nav:not(.scrolled) .nav-login-link { color: #fff; border-color: rgba(255,255,255,0.45); }
+body:not([data-nav-solid]) .nav:not(.scrolled) .nav-login-link:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
 .login-caret { width: 14px; height: 14px; transition: transform var(--fast); }
 .nav-login.open .login-caret { transform: rotate(180deg); }
 
