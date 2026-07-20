@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /crm/
 
-Sitemap: https://bayworks.in/sitemap.xml
+Sitemap: https://bayworks.billionairesbay.com/sitemap.xml
