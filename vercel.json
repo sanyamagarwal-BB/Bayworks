@@ -1,15 +1,8 @@
 {
-  "name": "BAYWORKS",
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "public": true,
-  "env": {
-    "VITE_WHATSAPP_NUMBER": {
-      "description": "WhatsApp number for contact",
-      "default": "919205005399"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",

@@ -390,7 +390,6 @@ export function applyCMS() {
           <h3>${p.name || ''}</h3>
           <p>${PIN_SVG} ${p.city || ''}</p>
           <p>${RULER_SVG} ${p.size || ''} · ${p.type || ''}</p>
-          <div class="property-price">${p.price || ''}</div>
           <div class="property-actions">
             <button type="button" class="btn-primary btn-sm" data-action="book" data-idx="${i}">Book Tour</button>
             <a class="btn-ghost btn-sm" data-action="wa" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="noopener">WhatsApp</a>
