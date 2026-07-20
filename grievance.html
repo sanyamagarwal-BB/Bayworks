@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raise a Grievance | BAYWORKS</title>
+  <meta name="description" content="Raise a grievance about how BayWorks handles your personal data — request access, correction, or erasure, or report a concern." />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script src="/sw-register.js"></script>
+</head>
+<body class="auth-body">
+  <main class="auth-shell">
+    <aside class="auth-aside" aria-hidden="true">
+      <a href="/" class="auth-logo"><span class="logo-text">BAYWORKS<sup class="logo-tm">™</sup></span></a>
+      <div class="auth-aside-body">
+        <p class="label-pill label-pill-white">Data Protection</p>
+        <h1 class="auth-aside-h">Raise a<br>grievance.</h1>
+        <p style="color: rgba(255,255,255,0.75); font-size: 0.9rem; line-height: 1.6; margin-top: 1rem;">
+          Use this form to ask what personal data BayWorks holds about you, request a
+          correction or deletion, or report a concern about how your data was handled.
+          We'll respond to you directly using the contact details you provide below.
+        </p>
+      </div>
+      <p class="auth-aside-foot">See our <a href="/privacy.html" style="color: inherit; text-decoration: underline;">Privacy Policy</a> for more on your rights.</p>
+    </aside>
+
+    <section class="auth-main">
+      <a href="/" class="auth-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Back to site
+      </a>
+      <div class="auth-toast" id="toast" role="status" aria-live="polite"></div>
+
+      <form class="auth-form is-active" id="form-grievance" novalidate>
+        <header class="auth-form-head">
+          <h2>Raise a grievance</h2>
+          <p>Tell us what happened and how to reach you — we'll follow up directly.</p>
+        </header>
+
+        <div class="form-row">
+          <label for="gr-name">Your name</label>
+          <input type="text" id="gr-name" name="name" placeholder="Full name" required />
+          <small class="field-err" data-err="gr-name"></small>
+        </div>
+
+        <div class="form-row">
+          <label for="gr-email">Email</label>
+          <input type="email" id="gr-email" name="email" placeholder="you@example.com" />
+        </div>
+
+        <div class="form-row">
+          <label for="gr-phone">Phone</label>
+          <input type="tel" id="gr-phone" name="phone" placeholder="+91 90000 00000" />
+        </div>
+        <small class="field-err" data-err="gr-contact"></small>
+
+        <div class="form-row">
+          <label for="gr-category">Nature of your request</label>
+          <select id="gr-category" name="category">
+            <option value="ACCESS">What data do you hold about me?</option>
+            <option value="CORRECTION">Correct my data</option>
+            <option value="ERASURE">Delete my data</option>
+            <option value="DATA_MISUSE">I have a concern about how my data was used</option>
+            <option value="OTHER">Something else</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="gr-description">Details</label>
+          <textarea id="gr-description" name="description" placeholder="Describe your request or concern" required></textarea>
+          <small class="field-err" data-err="gr-description"></small>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block" id="gr-submit"><span class="btn-label">Submit grievance</span><span class="btn-spinner" aria-hidden="true"></span></button>
+      </form>
+    </section>
+  </main>
+  <script type="module" src="/src/grievance.js"></script>
+</body>
+</html>

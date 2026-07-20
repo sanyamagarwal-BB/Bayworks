@@ -9,7 +9,7 @@
 
 const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
 const CRM_BASE  = env.VITE_CRM_BASE  || '/crm-api';
-const CRM_TOKEN = env.VITE_CRM_TOKEN || 'cap_ohlt1p4glsp';
+const CRM_TOKEN = env.VITE_CRM_TOKEN || 'cmrkfynyt0001nzfcjj9x0jcl';
 const CAPTURE_URL = `${CRM_BASE}/public/capture/${CRM_TOKEN}`;
 const QUEUE_KEY = 'bayworks_lead_queue';
 
@@ -20,7 +20,12 @@ async function post(payload) {
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
+  const data = await res.json();
+  // The endpoint returns 201 even on a bad token (body-level {ok:false}), so an
+  // HTTP-status-only check here would silently drop the lead without queuing a
+  // retry — treat a body-level failure the same as a network/HTTP failure.
+  if (data && data.ok === false) throw new Error(data.error || 'capture rejected');
+  return data;
 }
 
 function queue(payload) {

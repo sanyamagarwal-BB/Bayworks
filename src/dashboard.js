@@ -289,7 +289,7 @@ docsEl?.addEventListener('click', async (e) => {
 
 $('#doc-file')?.addEventListener('change', (e) => {
   const file = e.target.files[0]; if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { toast('File too large (max 5 MB).', true); e.target.value = ''; return; }
+  if (file.size > 20 * 1024 * 1024) { toast('File too large (max 20 MB).', true); e.target.value = ''; return; }
   const reader = new FileReader();
   reader.onload = async () => {
     try { await portal.uploadDocument({ name: file.name, url: reader.result, mimeType: file.type }); toast('Document uploaded.'); loadDocuments(); }

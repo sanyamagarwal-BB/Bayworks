@@ -46,7 +46,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#059669" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+  <script src="/sw-register.js"></script>
 </head>
 <body>
 
@@ -132,7 +132,7 @@
             <span class="hc-dot"></span>
             Get Your Free Shortlist in 48hrs
           </div>
-          <form class="hc-form" id="hero-brief-form" onsubmit="handleHeroBrief(event)">
+          <form class="hc-form" id="hero-brief-form">
             <div class="hc-field">
               <label>How many seats do you need?</label>
               <select name="seats">
@@ -614,7 +614,7 @@
         </div>
         <div class="footer-bottom">
           <span data-cms="footer_copy">© 2025 Billionaires Bay Global Realty LLP. All Rights Reserved.</span>
-          <span>BAYWORKS™</span>
+          <span><a href="/privacy.html" style="color:inherit;">Privacy Policy</a> · BAYWORKS™</span>
         </div>
       </div>
     </footer>
@@ -633,7 +633,7 @@
   </dialog>
 
   <script type="module" src="/src/main.js"></script>
+  <script src="/cookie-consent.js"></script>
   <script src="/chat.js"></script>
-  <script>BayWorksChat.init({ tenantId: '' });</script>
 </body>
 </html>

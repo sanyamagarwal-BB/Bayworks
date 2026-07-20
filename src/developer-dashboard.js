@@ -243,7 +243,7 @@ initBell({ basePath: '/developer-portal', tokenKey: 'bayworks_developer_token' }
   });
   fileInput?.addEventListener('change', (e) => {
     const f = e.target.files[0]; if (!f) return;
-    if (f.size > 5 * 1024 * 1024) { toast('File too large (max 5 MB).', true); e.target.value = ''; return; }
+    if (f.size > 20 * 1024 * 1024) { toast('File too large (max 20 MB).', true); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = async () => { try { await NS.uploadDocument({ name: f.name, url: r.result, mimeType: f.type }); toast('Document uploaded.'); load(); } catch (err) { toast(err.message || 'Upload failed.', true); } e.target.value = ''; };
     r.readAsDataURL(f);

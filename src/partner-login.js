@@ -12,6 +12,7 @@ if (isAuthenticated()) location.replace(next);
 const views = { signin: $('#form-signin'), signup: $('#form-signup'), twofa: $('#form-2fa') };
 const indicator = $('.auth-tab-indicator');
 let pending2faTicket = null;
+let pendingRemember = false;
 
 function showView(name) {
   Object.entries(views).forEach(([k, el]) => el.classList.toggle('is-active', k === name));
@@ -50,14 +51,15 @@ function busy(btn, on) { btn.classList.toggle('is-busy', on); btn.disabled = on;
 views.signin.addEventListener('submit', async (e) => {
   e.preventDefault(); clearErrs(views.signin);
   const email = $('#si-email').value, pass = $('#si-pass').value;
+  const remember = $('#si-remember').checked;
   let ok = true;
   if (!emailOk(email)) ok = setErr('si-email', 'Enter a valid email.') && ok;
   if (!pass) ok = setErr('si-pass', 'Password is required.') && ok;
   if (!ok) return;
   const btn = $('#si-submit'); busy(btn, true);
   try {
-    const r = await login({ email, password: pass });
-    if (r && r.twoFactorRequired) { pending2faTicket = r.ticket; busy(btn, false); showView('twofa'); return; }
+    const r = await login({ email, password: pass, remember });
+    if (r && r.twoFactorRequired) { pending2faTicket = r.ticket; pendingRemember = remember; busy(btn, false); showView('twofa'); return; }
     showToast('Signed in. Redirecting…', 'success'); setTimeout(() => location.replace(next), 500);
   } catch (err) { showToast(err.message || 'Sign in failed.'); }
   finally { busy(btn, false); }
@@ -70,7 +72,7 @@ views.twofa.addEventListener('submit', async (e) => {
   if (!pending2faTicket) { showView('signin'); return; }
   const btn = $('#tf-submit'); busy(btn, true);
   try {
-    await verify2fa(pending2faTicket, code);
+    await verify2fa(pending2faTicket, code, pendingRemember);
     showToast('Signed in. Redirecting…', 'success'); setTimeout(() => location.replace(next), 500);
   } catch (err) { setErr('tf-code', err.message || 'Invalid code.'); }
   finally { busy(btn, false); }
@@ -95,6 +97,15 @@ views.signup.addEventListener('submit', async (e) => {
 });
 
 function safeNext(v) { if (!v) return null; try { const d = decodeURIComponent(v); return d.startsWith('/') && !d.startsWith('//') ? d : null; } catch { return null; } }
+
+/* ── Demo account quick-fill ────────────────────────────────── */
+$('#si-demo-list')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-demo-email]');
+  if (!btn) return;
+  $('#si-email').value = btn.dataset.demoEmail;
+  $('#si-pass').value = btn.dataset.demoPass;
+  $('#si-pass').focus();
+});
 
 /* ── forgot password ────────────────────────────────────────── */
 $('#si-forgot').addEventListener('click', async () => {

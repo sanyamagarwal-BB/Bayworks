@@ -13,7 +13,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#059669" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+  <script src="/sw-register.js"></script>
 </head>
 <body class="auth-body">
 
@@ -87,8 +87,12 @@
           <span class="btn-spinner" aria-hidden="true"></span>
         </button>
 
-        <p class="auth-demo-hint">
-          Demo account: <button type="button" id="si-demo" class="auth-link">demo@bayworks.in / Demo@1234</button>
+        <p class="auth-demo-hint" id="si-demo-list">
+          Demo accounts:
+          <button type="button" class="auth-link" data-demo-email="sanyam.agarwal@thegitco.com" data-demo-pass="Portal@1234">sanyam.agarwal@thegitco.com</button>,
+          <button type="button" class="auth-link" data-demo-email="karthik@example.com" data-demo-pass="Portal@1234">karthik@example.com</button>,
+          <button type="button" class="auth-link" data-demo-email="meena@tech.co" data-demo-pass="Portal@1234">meena@tech.co</button>
+          (all / Portal@1234)
         </p>
 
         <div class="auth-divider"><span>or</span></div>

@@ -434,4 +434,10 @@
 
   /* ── Public API ──────────────────────────────────────────────── */
   window.BayWorksChat = { init: init };
+
+  // Self-init on load — every page embeds this script with the same default config,
+  // so there's no need for a separate inline `<script>BayWorksChat.init(...)</script>`
+  // per page (keeps CSP script-src to 'self', no unsafe-inline needed). A page can still
+  // override before this script loads via `window.BW_CHAT_CONFIG = { tenantId: '...' }`.
+  init();
 })();

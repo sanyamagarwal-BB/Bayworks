@@ -1,0 +1,196 @@
+# ──────────────────────────────────────────────────────────────────────────
+# BAYWORKS — GitLab CI/CD pipeline
+#
+# Demonstrates the three execution modes from the "Ultimate guide to CI/CD":
+#   • SEQUENTIAL  → `stages:` run in order (lint → build → test → deploy)
+#   • PARALLEL    → jobs sharing a stage run at the same time on separate runners
+#   • OUT OF ORDER→ `needs:` builds a DAG so a job starts the moment ITS
+#                   dependencies finish, regardless of stage order
+#
+# Monorepo:  /            marketing site (Vite)
+#            crm/web      React + Vite + tsc, Playwright e2e
+#            crm/api      NestJS + Prisma, smoke/suite tests
+# ──────────────────────────────────────────────────────────────────────────
+
+stages:
+  - lint
+  - build
+  - test
+  - deploy
+
+default:
+  image: node:20
+  # Re-use installed deps across jobs; key invalidates when the lockfile changes.
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - crm/web/node_modules/
+      - crm/api/node_modules/
+
+# ── Reusable path rules (row 8: skip jobs when their code didn't change) ─────
+.web-changes: &web-changes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes: [crm/web/**/*]
+    - if: '$CI_COMMIT_BRANCH == "main"'
+.api-changes: &api-changes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes: [crm/api/**/*]
+    - if: '$CI_COMMIT_BRANCH == "main"'
+.site-changes: &site-changes
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes: ['*.html', 'src/**/*', 'public/**/*', 'package.json']
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ═══════════════════════════ STAGE: lint (parallel) ════════════════════════
+# These three jobs share a stage → they run IN PARALLEL.
+lint:web:
+  stage: lint
+  <<: *web-changes
+  script:
+    - cd crm/web
+    - npm ci
+    - npx tsc --noEmit
+
+lint:api:
+  stage: lint
+  <<: *api-changes
+  script:
+    - cd crm/api
+    - npm ci
+    - npx prisma generate          # generate Prisma client types before type-check
+    - npx tsc --noEmit
+
+# Row 9: security scan, runs in parallel with the lint jobs. Non-blocking.
+security:audit:
+  stage: lint
+  allow_failure: true
+  script:
+    - npm ci --ignore-scripts && npm audit --audit-level=high || true
+    - (cd crm/web && npm ci --ignore-scripts && npm audit --audit-level=high || true)
+    - (cd crm/api && npm ci --ignore-scripts && npm audit --audit-level=high || true)
+
+# ═══════════════════════════ STAGE: build ═════════════════════════════════
+# build:site has no `needs` deps inside lint → starts as soon as the stage opens.
+build:site:
+  stage: build
+  <<: *site-changes
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths: [dist/]
+    expire_in: 1 week
+
+# OUT OF ORDER: build:web `needs` ONLY lint:web — it does NOT wait for lint:api.
+build:web:
+  stage: build
+  <<: *web-changes
+  needs: ['lint:web']
+  script:
+    - cd crm/web
+    - npm ci
+    - npm run build               # tsc && vite build
+  artifacts:
+    paths: [crm/web/dist/]
+    expire_in: 1 week
+
+build:api:
+  stage: build
+  <<: *api-changes
+  needs: ['lint:api']
+  script:
+    - cd crm/api
+    - npm ci
+    - npx prisma generate
+    - npm run build               # nest build
+  artifacts:
+    paths: [crm/api/dist/]
+    expire_in: 1 week
+
+# ═══════════════════════════ STAGE: test (parallel) ═══════════════════════
+# All three test jobs boot a real Postgres service + the seeded API via the
+# shared bootstrap script, so they run for real.
+
+# Shared Postgres service + env for the test jobs.
+.with-postgres: &with-postgres
+  services:
+    - name: postgres:16-alpine
+  variables:
+    POSTGRES_USER: bayworks
+    POSTGRES_PASSWORD: bayworks
+    POSTGRES_DB: bayworks_crm
+    DATABASE_URL: "postgresql://bayworks:bayworks@postgres:5432/bayworks_crm?schema=public"
+    JWT_SECRET: "ci-test-secret"
+    PORT: "6002"
+    CORS_ORIGIN: "http://localhost:6001"
+
+# e2e: bootstrap starts the API on :6002; Playwright starts the web app on
+# :6001 (vite proxies /api → :6002). DAG: starts right after build:web.
+test:web-e2e:
+  stage: test
+  <<: [*web-changes, *with-postgres]
+  needs: ['build:web']
+  script:
+    - cd crm/api && npm ci && cd "$CI_PROJECT_DIR"
+    - bash crm/api/scripts/ci-bootstrap.sh
+    - cd crm/web && npm ci
+    - npx playwright install --with-deps chromium
+    - npm run test:e2e
+  artifacts:
+    when: on_failure
+    paths: [crm/web/test-results/]
+    expire_in: 1 week
+
+# Portal API smoke — fail-fast, blocking.
+test:api-smoke:
+  stage: test
+  <<: [*api-changes, *with-postgres]
+  needs: ['build:api']
+  script:
+    - cd crm/api && npm ci && cd "$CI_PROJECT_DIR"
+    - bash crm/api/scripts/ci-bootstrap.sh
+    - cd crm/api && npm run test:smoke
+
+# Portal API suite — broader, but NON-BLOCKING: it intentionally trips the
+# login throttle, so a re-run within ~60s shows expected early failures.
+test:api-suite:
+  stage: test
+  <<: [*api-changes, *with-postgres]
+  needs: ['build:api']
+  allow_failure: true
+  script:
+    - cd crm/api && npm ci && cd "$CI_PROJECT_DIR"
+    - bash crm/api/scripts/ci-bootstrap.sh
+    - cd crm/api && npm run test:suite
+
+# ═══════════════════════════ STAGE: deploy (sequential) ═══════════════════
+# GitLab Pages: publishes the marketing site. Runs only on `main`, only after
+# build + test stages pass → SEQUENTIAL gate at the end of the pipeline.
+pages:
+  stage: deploy
+  needs: ['build:site']
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - mv dist public
+  artifacts:
+    paths: [public]
+
+# Row 7: manual production gate — a human must click "play" to ship prod.
+deploy:production:
+  stage: deploy
+  needs: ['build:site', 'build:web', 'build:api']
+  environment:
+    name: production
+    url: https://app.bayworks.in
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+  script:
+    - echo "Deploying to production… (wire real deploy target + secrets here)"

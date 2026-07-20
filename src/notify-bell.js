@@ -79,19 +79,26 @@ export function initBell({ basePath, tokenKey }) {
   document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
 
   // Live stream (SSE via Redis pub/sub); falls back to polling if it errors.
+  // EventSource can't set an Authorization header, so instead of putting the
+  // real (long-lived) session token in the URL — where it'd sit in server and
+  // proxy access logs — we exchange it for a 60s single-purpose ticket first,
+  // over a normal authenticated call.
   let polling = null;
   function startPolling() { if (!polling) polling = setInterval(refresh, 30_000); }
-  try {
-    const es = new EventSource(`${BASE}${basePath}/notifications/stream?token=${encodeURIComponent(token())}`);
-    es.onmessage = (ev) => {
-      try {
-        const n = JSON.parse(ev.data);
-        setBadge(unread + 1);
-        if (!menu.hidden) open(); // refresh open list
-      } catch { /* ignore non-JSON */ }
-    };
-    es.onerror = () => { es.close(); startPolling(); };
-  } catch { startPolling(); }
+  (async () => {
+    try {
+      const { ticket } = await api('/notifications/sse-ticket');
+      const es = new EventSource(`${BASE}${basePath}/notifications/stream?token=${encodeURIComponent(ticket)}`);
+      es.onmessage = (ev) => {
+        try {
+          const n = JSON.parse(ev.data);
+          setBadge(unread + 1);
+          if (!menu.hidden) open(); // refresh open list
+        } catch { /* ignore non-JSON */ }
+      };
+      es.onerror = () => { es.close(); startPolling(); };
+    } catch { startPolling(); }
+  })();
 
   refresh();
 }

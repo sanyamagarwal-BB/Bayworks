@@ -6,7 +6,7 @@
 import { getSession, logout } from './auth.js';
 
 const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
-const CRM_WEB_URL = env.VITE_CRM_WEB_URL || 'http://localhost:5180/login';
+const CRM_WEB_URL = env.VITE_CRM_WEB_URL || 'http://localhost:6001/login';
 
 // The login options shown in the dropdown nest.
 const LOGINS = [

@@ -1,14 +1,17 @@
-/* BAYWORKS — Reset password page controller (audience-aware: customer/partner/developer) */
+/* BAYWORKS — Reset password page controller (audience-aware: customer/partner/developer/staff) */
 const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
 const BASE = env.VITE_CRM_BASE || '/crm-api';
+const CRM_WEB_URL = env.VITE_CRM_WEB_URL || 'http://localhost:6001/login';
 
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
 const token = params.get('token') || '';
 const aud = (params.get('aud') || 'customer').toLowerCase();
 
-const PATHS = { customer: '/portal', partner: '/partner-portal', developer: '/developer-portal' };
-const LOGINS = { customer: '/login.html', partner: '/partner-login.html', developer: '/developer-login.html' };
+// Staff has no /portal-style prefix — its controller is @Controller('auth') directly —
+// and its "login page" isn't on this site at all, it's the separate CRM web app.
+const PATHS = { customer: '/portal', partner: '/partner-portal', developer: '/developer-portal', staff: '' };
+const LOGINS = { customer: '/login.html', partner: '/partner-login.html', developer: '/developer-login.html', staff: CRM_WEB_URL };
 const basePath = PATHS[aud] || PATHS.customer;
 const loginUrl = LOGINS[aud] || LOGINS.customer;
 

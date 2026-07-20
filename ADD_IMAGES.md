@@ -393,7 +393,7 @@ After:  150 KB .jpg  ← Much faster loading!
 1. **Test locally:**
    ```bash
    npm run dev
-   # Open http://localhost:5173
+   # Open http://localhost:6005
    # Verify images load
    ```
 

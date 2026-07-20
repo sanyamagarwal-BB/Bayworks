@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#059669" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+  <script src="/sw-register.js"></script>
 </head>
 <body class="dash-body">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -68,7 +68,7 @@
       <section class="dash-card dash-card-wide">
         <div class="dash-card-head">
           <h2>Documents</h2>
-          <label class="btn-ghost btn-sm" style="cursor:pointer">Upload<input type="file" id="doc-file" hidden /></label>
+          <label class="btn-ghost btn-sm" style="cursor:pointer">Upload<input type="file" id="doc-file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.jpg,.jpeg,.png,.gif,.webp" hidden /></label>
         </div>
         <ul class="dash-list" id="dash-documents"></ul>
       </section>

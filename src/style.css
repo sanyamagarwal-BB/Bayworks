@@ -1271,15 +1271,16 @@ img { display: block; max-width: 100%; }
 .modal-form { display: flex; flex-direction: column; gap: 1.1rem; padding: 1.8rem 2rem; }
 .form-row { display: flex; flex-direction: column; gap: 0.35rem; }
 .form-row label { font-family: var(--font-head); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
-.form-row input, .form-row select {
+.form-row input, .form-row select, .form-row textarea {
   padding: 0.7rem 1rem; background: white;
   border: 1.5px solid var(--gray-200); color: var(--ink);
   font-size: 0.88rem; outline: none;
   transition: border-color var(--fast); border-radius: var(--radius);
-  appearance: none;
+  appearance: none; font-family: inherit;
 }
-.form-row input::placeholder { color: var(--gray-300); }
-.form-row input:focus, .form-row select:focus {
+.form-row textarea { resize: vertical; min-height: 6rem; }
+.form-row input::placeholder, .form-row textarea::placeholder { color: var(--gray-300); }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
   border-color: var(--green); box-shadow: 0 0 0 3px rgba(5,150,105,0.10);
 }
 

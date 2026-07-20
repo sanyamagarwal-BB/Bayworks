@@ -30,6 +30,11 @@ The marketing site is the **only** thing the public hits. The three portals
 the CRM API. BayWorks is always the mediator: developers/partners never receive
 customer contact details (enforced server-side; see `npm run test:suite`).
 
+**TLS / WAF / DDoS:** see `RUNBOOK-CLOUDFLARE.md` — Cloudflare's free tier sits
+in front of every domain here, independent of whichever host ends up running
+the CRM API. Do this once the API's host (still an open "Node host / container"
+choice below) is picked.
+
 ---
 
 ## 1. Datastores

@@ -10,7 +10,7 @@ import { track } from './analytics.js';
 import './nav-account.js';
 
 // Hero brief form — captures the lead to CRM, then opens WhatsApp pre-filled
-window.handleHeroBrief = function(e) {
+function handleHeroBrief(e) {
   e.preventDefault();
   const f = e.target;
   const seats = f.seats.value || 'Not specified';
@@ -33,9 +33,10 @@ window.handleHeroBrief = function(e) {
     `Hi BAYWORKS, I need office space:\n• Seats: ${seats}\n• City: ${city}\n• My number: ${phone}\n\nPlease send me a shortlist.`
   );
   window.open(`https://wa.me/919205005399?text=${msg}`, '_blank');
-};
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('hero-brief-form')?.addEventListener('submit', handleHeroBrief);
   applyCMSFromAPI().then(hydrateLiveInventory);
   initNav();
   initReveal();
@@ -148,8 +149,14 @@ function initHeroBackground() {
   video.addEventListener('canplay', useVideo, { once: true });
   video.addEventListener('error', useCity, { once: true });
   video.querySelector('source')?.addEventListener('error', useCity, { once: true });
-  // Safety net: if the file is missing and no event fires, fall back to 3D.
-  setTimeout(() => { if (!decided && video.readyState < 2) useCity(); }, 2500);
+  // Safety net: only bail once the browser has given up finding a playable
+  // source. A large clip on a slow connection is still "arriving" (readyState
+  // stays low for a while) and shouldn't be abandoned for the 3D fallback —
+  // that used to happen after just 2.5s, which made the real video flicker
+  // into the canvas fallback on anything slower than localhost.
+  setTimeout(() => {
+    if (!decided && video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) useCity();
+  }, 8000);
 }
 
 /* ── FAVORITES (localStorage, no account needed) ──────────────── */

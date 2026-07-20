@@ -27,7 +27,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#059669" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}</script>
+  <script src="/sw-register.js"></script>
 </head>
 <body>
 
@@ -404,7 +404,7 @@
         </div>
         <div class="footer-bottom">
           <span data-cms="footer_copy">© 2025 Billionaires Bay Global Realty LLP. All Rights Reserved.</span>
-          <span>BAYWORKS™</span>
+          <span><a href="/privacy.html" style="color:inherit;">Privacy Policy</a> · BAYWORKS™</span>
         </div>
       </div>
     </footer>
@@ -412,5 +412,6 @@
   </main>
 
   <script type="module" src="/src/main.js"></script>
+  <script src="/cookie-consent.js"></script>
 </body>
 </html>

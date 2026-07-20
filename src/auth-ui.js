@@ -197,9 +197,13 @@ views.forgot.addEventListener('submit', async (e) => {
 });
 
 /* ── Demo account quick-fill ────────────────────────────────── */
-$('#si-demo')?.addEventListener('click', () => {
-  $('#si-email').value = 'demo@bayworks.in';
-  $('#si-pass').value = 'Demo@1234';
+// Live seeded customer accounts (crm/api/prisma/seed.ts) — work against the
+// running CRM API. Falls back to the offline DEMO_ACCOUNT only if the API is down.
+$('#si-demo-list')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-demo-email]');
+  if (!btn) return;
+  $('#si-email').value = btn.dataset.demoEmail;
+  $('#si-pass').value = btn.dataset.demoPass;
   $('#si-pass').focus();
   showToast('Demo credentials filled — press Sign In.', 'info');
 });

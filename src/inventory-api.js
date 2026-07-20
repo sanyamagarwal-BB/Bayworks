@@ -5,7 +5,7 @@
  */
 const env = (typeof import.meta !== 'undefined' && import.meta.env) || {};
 const BASE = env.VITE_CRM_BASE || '/crm-api';
-const TOKEN = env.VITE_CRM_TOKEN || 'cap_ohlt1p4glsp';
+const TOKEN = env.VITE_CRM_TOKEN || 'cmrkfynyt0001nzfcjj9x0jcl';
 
 /**
  * @returns {Promise<Array|null>} live property objects, or null if unavailable.

@@ -158,8 +158,10 @@ document.getElementById('visit-form')?.addEventListener('submit', async (e) => {
   btn.disabled = false; btn.textContent = 'Request a Visit';
 });
 
-/* Scroll helper used by an inline onclick in the page. */
-window.scrollToForm = () => document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+/* "Book a Visit" button scrolls down to the contact form. */
+document.querySelector('.btn-book')?.addEventListener('click', () => {
+  document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 flushLeadQueue();
 loadUnit();
